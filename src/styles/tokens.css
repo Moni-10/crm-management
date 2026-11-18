@@ -1,0 +1,132 @@
+/* Design tokens. Every colour in the app comes from here, so light and dark stay in sync.
+   Direction: print-shop precision. Ink-navy chrome, one red accent from the MMW letterhead,
+   and the CMYK process colours used as data hues. */
+
+:root,
+:root[data-theme='light'] {
+    color-scheme: light;
+
+    --bg: #f2f4f8;
+    --surface: #ffffff;
+    --surface-2: #f7f8fb;
+    --surface-3: #eef1f6;
+    --border: #e1e6ee;
+    --border-strong: #c9d1de;
+
+    --text: #101828;
+    --text-2: #46526a;
+    --text-3: #66728a;
+
+    --primary: #2347d5;
+    --primary-hover: #1b39ad;
+    --primary-soft: #e8edfd;
+    --on-primary: #ffffff;
+
+    --brand-red: #d6232a;
+
+    --success: #137a3f;
+    --success-soft: #def5e8;
+    --warning: #a35a00;
+    --warning-soft: #fdf0d5;
+    --danger: #c62828;
+    --danger-soft: #fde7e7;
+    --info: #1d5fb8;
+    --info-soft: #e3effd;
+
+    /* CMYK process colours, used as data hues */
+    --cyan: #0891b2;
+    --cyan-soft: #dcf4fa;
+    --magenta: #c71f6b;
+    --magenta-soft: #fbe3ee;
+    --yellow: #b98100;
+    --yellow-soft: #fbf0cf;
+    --key: #273247;
+    --key-soft: #e6e9f0;
+
+    /* Sidebar follows the theme: light here, ink-navy in dark mode */
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #46526a;
+    --sidebar-text-strong: #101828;
+    --sidebar-muted: #66728a;
+    --sidebar-hover: #f2f4f8;
+    --sidebar-active: #e8edfd;
+    --sidebar-border: #e1e6ee;
+    --brand-mark-bg: #ffffff;
+    --brand-mark-fg: #0c1424;
+
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --shadow-md: 0 4px 16px -4px rgba(16, 24, 40, 0.12);
+    --shadow-pop: 0 18px 40px -12px rgba(16, 24, 40, 0.3);
+    --overlay: rgba(10, 16, 30, 0.55);
+
+    --focus: #2347d5;
+}
+
+:root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --bg: #0a0f1c;
+    --surface: #111a2e;
+    --surface-2: #16213a;
+    --surface-3: #1c2945;
+    --border: #25324e;
+    --border-strong: #35445f;
+
+    --text: #e8ecf4;
+    --text-2: #a9b4c9;
+    --text-3: #8b98b0;
+
+    --primary: #5b7cfa;
+    --primary-hover: #7390ff;
+    --primary-soft: #1d2a52;
+    --on-primary: #0a0f1c;
+
+    --success: #4cc783;
+    --success-soft: #12301f;
+    --warning: #f0b24d;
+    --warning-soft: #33260c;
+    --danger: #ff7b7b;
+    --danger-soft: #3a1717;
+    --info: #6ea8ff;
+    --info-soft: #14284a;
+
+    --cyan: #3cc3e2;
+    --cyan-soft: #0f2f3a;
+    --magenta: #f06aa3;
+    --magenta-soft: #3a1527;
+    --yellow: #f3c64a;
+    --yellow-soft: #352b0b;
+    --key: #b8c3da;
+    --key-soft: #1f2a42;
+
+    --sidebar-bg: #070c17;
+    --sidebar-text: #aab5cb;
+    --sidebar-text-strong: #ffffff;
+    --sidebar-muted: #7d8aa5;
+    --sidebar-hover: rgba(255, 255, 255, 0.06);
+    --sidebar-active: rgba(255, 255, 255, 0.1);
+    --sidebar-border: rgba(255, 255, 255, 0.07);
+    --brand-mark-bg: #ffffff;
+    --brand-mark-fg: #0c1424;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px -4px rgba(0, 0, 0, 0.5);
+    --shadow-pop: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
+    --overlay: rgba(2, 5, 12, 0.7);
+
+    --focus: #8aa2ff;
+}
+
+:root {
+    --font-display: 'Bricolage Grotesque', 'Public Sans', system-ui, sans-serif;
+    --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+
+    --sidebar-w: 248px;
+    --topbar-h: 64px;
+
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

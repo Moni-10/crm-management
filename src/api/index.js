@@ -1,0 +1,57 @@
+import { http } from './client';
+
+// One small client per backend resource: list / get / create / update / remove.
+const createResourceApi = (name) => ({
+    list: () => http.get(`/${name}`),
+    get: (id) => http.get(`/${name}/${encodeURIComponent(id)}`),
+    create: (data) => http.post(`/${name}`, data),
+    update: (data) => http.put(`/${name}/${encodeURIComponent(data.id)}`, data),
+    remove: (id) => http.delete(`/${name}/${encodeURIComponent(id)}`),
+    // -> { created, failed, errors: [{ row, message }] }
+    bulkCreate: (records) => http.post(`/${name}/bulk`, { records })
+});
+
+export const salespersonsApi = createResourceApi('salespersons');
+export const partiesApi = createResourceApi('parties');
+export const machinesApi = createResourceApi('machines');
+export const quotationsApi = createResourceApi('quotations');
+export const eventsApi = createResourceApi('events');
+
+// -> { salespersons: [], parties: [], machines: [], quotations: [], events: [] }
+export const searchApi = {
+    search: (query, limit = 5) => http.get(`/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+};
+
+export const healthApi = {
+    check: () => http.get('/health', { auth: false })
+};
+
+// -> [{ id, type, description, createdAt }], newest first
+export const activityApi = {
+    recent: (limit = 10) => http.get(`/activity?limit=${limit}`)
+};
+
+export const authApi = {
+    login: (email, password) => http.post('/auth/login', { email, password }, { auth: false }),
+    me: () => http.get('/auth/me'),
+    updateProfile: (name) => http.put('/auth/profile', { name }),
+    changePassword: (currentPassword, newPassword) => http.post('/auth/change-password', { currentPassword, newPassword })
+};
+
+// The company's own details. Reading is public; updating needs an admin.
+export const companyApi = {
+    get: () => http.get('/company', { auth: false }),
+    update: (details) => http.put('/company', details)
+};
+
+// Admin-only data tools
+export const adminApi = {
+    dataStatus: () => http.get('/admin/data-status'),
+    loadSampleData: () => http.post('/admin/sample-data', {}),
+    clearData: (password) => http.post('/admin/clear-data', { password })
+};
+
+export const backupApi = {
+    export: () => http.get('/backup'),
+    import: (data) => http.post('/backup/import', data)
+};
