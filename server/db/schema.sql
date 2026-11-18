@@ -147,3 +147,33 @@ CREATE TABLE IF NOT EXISTS company (
     logo MEDIUMTEXT NULL,
     updated_at DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Calling Data: one row per phone call. Party is free text so Excel sheets import even when the party is not in the CRM yet.
+CREATE TABLE IF NOT EXISTS calls (
+    id VARCHAR(40) PRIMARY KEY,
+    party_name VARCHAR(200) NOT NULL,
+    nickname VARCHAR(150) NULL,
+    contact_person VARCHAR(150) NULL,
+    mobile VARCHAR(30) NULL,
+    whatsapp VARCHAR(30) NULL,
+    email VARCHAR(150) NULL,
+    city VARCHAR(100) NULL,
+    state VARCHAR(100) NULL,
+    address TEXT NULL,
+    call_date DATE NULL,
+    call_time VARCHAR(8) NULL,
+    duration INT NULL,
+    machine_interest VARCHAR(200) NULL,
+    machine_number VARCHAR(100) NULL,
+    requirement TEXT NULL,
+    call_type VARCHAR(30) NOT NULL DEFAULT 'Follow-up',
+    handled_by VARCHAR(150) NULL,
+    notes TEXT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'completed',
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_call_date (call_date),
+    INDEX idx_call_city (city),
+    INDEX idx_call_party (party_name),
+    INDEX idx_call_mobile (mobile)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

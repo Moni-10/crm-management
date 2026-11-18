@@ -68,6 +68,10 @@ export const statusTone = (status) => STATUS_TONES[status] || 'neutral';
 
 export const digitsOnly = (value) => String(value || '').replace(/\D/g, '');
 
+// Opens the mail app with a ready message. WhatsApp-style *bold* markers are removed for email.
+export const mailtoUrl = (to, subject, body) =>
+    `mailto:${String(to || '').replace(/[\s?&#]/g, '')}?subject=${encodeURIComponent(subject || '')}&body=${encodeURIComponent(String(body || '').replace(/\*/g, ''))}`;
+
 // Opens WhatsApp for a number; 10-digit Indian numbers get the 91 prefix.
 export const whatsappUrl = (mobile, text = '') => {
     const digits = digitsOnly(mobile);

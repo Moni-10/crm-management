@@ -16,6 +16,17 @@ export const partiesApi = createResourceApi('parties');
 export const machinesApi = createResourceApi('machines');
 export const quotationsApi = createResourceApi('quotations');
 export const eventsApi = createResourceApi('events');
+// Calling Data can hold very large sheets: search/filter/paging run on the server.
+export const callsApi = {
+    ...createResourceApi('calls'),
+    // -> { items, total, page, pageSize, cities }
+    query: (params) => {
+        const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v != null));
+        return http.get(`/calls/query?${qs}`);
+    },
+    // Fast bulk insert for Excel uploads; firstRow numbers the rows in error messages. -> { created, failed, errors }
+    importRows: (records, firstRow = 1) => http.post('/calls/import', { records, offset: firstRow - 1 })
+};
 
 // -> { salespersons: [], parties: [], machines: [], quotations: [], events: [] }
 export const searchApi = {

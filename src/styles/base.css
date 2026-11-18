@@ -149,6 +149,62 @@ table { border-collapse: collapse; width: 100%; }
 .table th button.sort svg { width: 14px; height: 14px; }
 .table .cell-main { font-weight: 600; }
 .table .cell-sub { font-size: 12.5px; color: var(--text-3); }
+
+/* Spreadsheet grid (Calling Data): Excel-like gridlines, sticky header, sticky S.No + Party Name + Actions. */
+.sheet-wrap {
+    overflow: auto; max-height: calc(100vh - 260px); min-height: 160px;
+    background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px;
+}
+.sheet { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+.sheet th, .sheet td {
+    padding: 9px 12px; white-space: nowrap; text-align: left; vertical-align: middle;
+    border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); color: var(--text);
+}
+.sheet th:last-child, .sheet td:last-child { border-right: 0; }
+.sheet thead th {
+    position: sticky; top: 0; z-index: 2; background: var(--surface-2);
+    font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-2);
+    border-bottom: 2px solid var(--border-strong);
+}
+.sheet tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 55%, var(--surface)); }
+.sheet tbody tr td { background: var(--surface); transition: background-color 0.12s; }
+.sheet tbody tr:hover td { background: var(--primary-soft); }
+.sheet tbody tr:last-child td { border-bottom: 0; }
+/* Frozen columns */
+.sheet .sheet-sno { position: sticky; left: 0; z-index: 1; width: 56px; min-width: 56px; text-align: center; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.sheet .sheet-strong { position: sticky; left: 56px; z-index: 1; min-width: 180px; font-weight: 600; box-shadow: 1px 0 0 var(--border-strong); }
+.sheet .sheet-actions { position: sticky; right: 0; z-index: 1; width: 1%; text-align: center; box-shadow: -1px 0 0 var(--border-strong); }
+.sheet thead .sheet-sno, .sheet thead .sheet-strong, .sheet thead .sheet-actions { z-index: 3; }
+.sheet td.sheet-actions { padding: 4px 8px; }
+.sheet td.sheet-actions .icon-btn + .icon-btn { margin-left: 4px; }
+.sheet .sheet-num { font-variant-numeric: tabular-nums; }
+.sheet .sheet-right { text-align: right; }
+.sheet .sheet-notes { max-width: 280px; overflow: hidden; text-overflow: ellipsis; }
+.sheet-tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    background: var(--surface-3); color: var(--text-2);
+}
+.sheet-tag.tag-followup { background: var(--warning-soft); color: var(--warning); }
+.sheet-tag.tag-sales { background: var(--success-soft); color: var(--success); }
+.sheet-tag.tag-support { background: var(--info-soft); color: var(--info); }
+.sheet-empty { text-align: center !important; padding: 40px 12px !important; color: var(--text-2); }
+.sheet-wrap.is-loading .sheet tbody { opacity: 0.55; transition: opacity 0.15s; }
+.sheet-pager {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    margin-top: 12px; font-size: 14px; color: var(--text-2);
+}
+.sheet-pager-size { display: flex; align-items: center; gap: 8px; }
+.sheet-pager-size .input { width: auto; min-height: 34px; padding-top: 4px; padding-bottom: 4px; }
+.sheet-pager-nav { display: flex; align-items: center; gap: 10px; }
+.sheet-pager-nav .btn { min-height: 34px; padding: 4px 10px; }
+.sheet-progress {
+    display: grid; gap: 8px; margin-bottom: 16px; padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--info-soft); color: var(--info); font-size: 14px;
+}
+.sheet-progress-bar { height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--info) 20%, transparent); overflow: hidden; }
+.sheet-progress-bar span { display: block; height: 100%; background: var(--info); transition: width 0.2s; }
+.sheet-link { all: unset; cursor: pointer; color: var(--primary); font-weight: 600; }
+.sheet-link:hover { text-decoration: underline; }
 .row-actions { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
 .link-row { cursor: pointer; }
 
@@ -316,3 +372,67 @@ table { border-collapse: collapse; width: 100%; }
 .combo-none { padding: 14px 10px; text-align: center; font-size: 14px; color: var(--text-3); }
 
 .toolbar .combo-trigger { width: auto; min-width: 170px; }
+
+/* ---------- Salesperson detail ---------- */
+.sp-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; font-size: 14px; color: var(--text-2); text-decoration: none; }
+.sp-back:hover { color: var(--primary); }
+.sp-hero {
+    position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    padding: 24px; margin-bottom: 16px;
+    background:
+        radial-gradient(420px 200px at 100% 0%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+        var(--surface);
+}
+.sp-hero::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(#00a6d6, #d6246e, #f2b705); }
+.sp-hero-main { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.sp-hero h1 { font-size: 26px; margin: 0 0 4px; }
+.sp-hero-sub { display: flex; gap: 10px; flex-wrap: wrap; color: var(--text-2); font-size: 14px; }
+.sp-hero-contacts { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; }
+.sp-hero-contacts a { display: inline-flex; align-items: center; gap: 6px; color: var(--text); text-decoration: none; }
+.sp-hero-contacts a:hover { color: var(--primary); }
+.avatar.xl { width: 72px; height: 72px; font-size: 26px; border-radius: 50%; }
+.sp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.sp-stat {
+    --tone: #00a6d6;
+    display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+}
+.sp-stat > svg { flex: none; width: 40px; height: 40px; padding: 9px; border-radius: 12px; color: var(--tone); background: color-mix(in srgb, var(--tone) 14%, transparent); }
+.sp-stat b { display: block; font-size: 22px; font-family: var(--font-display); line-height: 1.1; }
+.sp-stat span { font-size: 13px; color: var(--text-2); }
+.sp-stat.tone-m { --tone: #d6246e; }
+.sp-stat.tone-y { --tone: #e0a800; }
+.sp-stat.tone-g { --tone: var(--success); }
+.sp-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+.sp-tabs button {
+    all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; margin-bottom: -1px;
+    font-weight: 600; font-size: 14px; color: var(--text-2); border-bottom: 2px solid transparent;
+}
+.sp-tabs button span { padding: 1px 8px; border-radius: 999px; font-size: 12px; background: var(--surface-3); }
+.sp-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+.sp-tabs button:focus-visible { outline: 2px solid var(--focus); border-radius: 6px; }
+.sp-hint { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 13px; color: var(--text-3); }
+.sp-open { width: 100%; justify-content: center; margin: 4px 0 8px; }
+.sp-name-link { color: inherit; text-decoration: none; }
+.sp-name-link:hover { color: var(--primary); }
+
+/* Client form (salesperson page) */
+.client-form-section { margin: 18px 0 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.client-form-section:first-child { margin-top: 0; }
+.client-wa { display: flex; gap: 8px; align-items: center; }
+.client-wa .input { flex: 1; min-width: 0; }
+.client-form-note { margin: 16px 0 0; font-size: 13px; color: var(--text-3); }
+
+/* Client "Send" menu (salesperson page) */
+.client-share-menu { z-index: 1200; min-width: 270px; max-width: 340px; }
+.menu-label { padding: 6px 12px 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.menu-item.disabled { cursor: default; color: var(--text-3); }
+.menu-item.disabled:hover { background: none; }
+.client-share-quote { display: flex; align-items: center; gap: 2px; padding: 0 6px 0 12px; }
+.client-share-quote-no { flex: 1; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.client-share-quote .menu-item { width: auto; padding: 6px 8px; font-size: 13px; }
+.icon-btn.share { color: #25a244; }
+.sheet td.sheet-actions a.icon-btn { display: inline-grid; place-items: center; vertical-align: middle; }
+.client-share-quote .menu-item { gap: 5px; }
+.client-share-menu .menu-item svg { flex-shrink: 0; }
+.client-share-menu { min-width: 300px; }

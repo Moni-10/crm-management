@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Copy, FileDown, MessageCircle, Share2 } from 'lucide-react';
-import { showToast, whatsappUrl } from '../../utils/helpers';
+import { ChevronDown, Copy, FileDown, Mail, MessageCircle, Share2 } from 'lucide-react';
+import { mailtoUrl, showToast, whatsappUrl } from '../../utils/helpers';
 
 const inr = (value) => `₹${(Number(value) || 0).toLocaleString('en-IN')}`;
 
@@ -77,6 +77,14 @@ export default function ShareMenu({ quotation, onDownload }) {
                         onClick={() => setOpen(false)}
                     >
                         <MessageCircle style={{ color: '#25a244' }} /> Send on WhatsApp
+                    </a>
+                    <a
+                        className="menu-item"
+                        role="menuitem"
+                        href={mailtoUrl(quotation.email, `Quotation ${quotation.quotationNumber} - Mohindra Mechanical Works`, quotationText(quotation))}
+                        onClick={() => setOpen(false)}
+                    >
+                        <Mail /> Send by email
                     </a>
                     <button type="button" className="menu-item" role="menuitem" onClick={run(onDownload)}>
                         <FileDown /> Download PDF

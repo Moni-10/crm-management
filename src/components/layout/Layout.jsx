@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
-    BarChart3, Building2, CalendarDays, Clock, Cog, DatabaseBackup, FileText, LayoutDashboard, Menu, Phone, Users, X
+    BarChart3, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Menu, Phone, Users, X
 } from 'lucide-react';
-import { useCompany } from '../../context/CompanyContext';
 import BrandMark from './BrandMark';
 import GlobalSearch from './GlobalSearch';
 import ProfileMenu from './ProfileMenu';
@@ -19,8 +18,7 @@ const NAV_GROUPS = [
         items: [
             { to: '/parties', label: 'Parties', icon: Building2 },
             { to: '/salespersons', label: 'Salespersons', icon: Users },
-            { to: '/machines', label: 'Machines', icon: Cog },
-            { to: '/calling-details', label: 'Calling Details', icon: Phone }
+            { to: '/calling-details', label: 'Calling Data', icon: Phone }
         ]
     },
     {
@@ -44,7 +42,6 @@ const isActive = (to, pathname) => (to === '/' ? pathname === '/' : pathname ===
 
 export default function Layout() {
     const { pathname } = useLocation();
-    const { company } = useCompany();
     const [menuOpen, setMenuOpen] = useState(false);
 
     // Close the mobile menu after navigating.
@@ -57,10 +54,6 @@ export default function Layout() {
             <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`} aria-label="Main">
                 <div className="brand">
                     <BrandMark />
-                    <div style={{ minWidth: 0 }}>
-                        <div className="brand-name">{company.name}</div>
-                        <div className="brand-sub">Sales CRM</div>
-                    </div>
                     <button type="button" className="icon-btn sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
                         <X />
                     </button>
@@ -85,10 +78,6 @@ export default function Layout() {
                     ))}
                 </nav>
 
-                <div className="sidebar-foot">
-                    <div className="cmyk-strip" aria-hidden="true"><span /><span /><span /><span /></div>
-                    <p>{company.tagline.split(/\r?\n/).filter(Boolean).slice(-1)[0] || 'Sales CRM'}</p>
-                </div>
             </aside>
 
             {menuOpen && <div className="app-backdrop" onClick={() => setMenuOpen(false)} />}

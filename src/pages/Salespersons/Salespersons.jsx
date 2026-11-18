@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, ImagePlus, Mail, MessageCircle, Pencil, Phone, Plus, Search, Trash2, Upload, Users } from 'lucide-react';
+import { Briefcase, ImagePlus, Mail, MessageCircle, Pencil, Phone, PhoneCall, Plus, Search, Trash2, Upload, Users } from 'lucide-react';
 import { partiesApi, salespersonsApi } from '../../api';
 import BulkUploadModal from '../../components/bulk/BulkUploadModal';
 import ExportButton from '../../components/bulk/ExportButton';
@@ -187,7 +187,7 @@ export default function Salespersons() {
                                 <div className="person-top">
                                     <Avatar name={s.fullName} size="lg" src={s.photo} />
                                     <div style={{ minWidth: 0 }}>
-                                        <h3 className="truncate">{s.fullName}</h3>
+                                        <h3 className="truncate"><Link to={`/salespersons/${s.id}`} className="sp-name-link">{s.fullName}</Link></h3>
                                         <div className="sub">{s.nickname ? `“${s.nickname}”` : 'No nickname'}</div>
                                     </div>
                                 </div>
@@ -197,6 +197,7 @@ export default function Salespersons() {
                                     {s.email && <div><Mail aria-hidden="true" /><span className="truncate">{s.email}</span></div>}
                                     {(s.department || s.employeeId) && <div><Briefcase aria-hidden="true" /><span>{[s.department, s.employeeId].filter(Boolean).join(' · ')}</span></div>}
                                 </div>
+                                <Link to={`/salespersons/${s.id}`} className="btn btn-sm sp-open"><PhoneCall /> Clients, machines &amp; quotations</Link>
                                 <div className="person-foot">
                                     <Link to={`/parties?salesperson=${s.id}`} className="cell-main">{count} part{count === 1 ? 'y' : 'ies'}</Link>
                                     <div className="row-actions">

@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, Cog, FileText, Users } from 'lucide-react';
+import { Building2, CalendarDays, Cog, FileText, Phone, Users } from 'lucide-react';
 
 // How each kind of search result is labelled, summarised and linked.
 // Shared by the header search dropdown and the full results page.
@@ -35,6 +35,14 @@ export const SEARCH_GROUPS = [
         title: (q) => q.quotationNumber,
         subtitle: (q) => [q.companyName, q.status, q.totalAmount ? `₹${Number(q.totalAmount).toLocaleString('en-IN')}` : ''].filter(Boolean).join(' · '),
         link: (q) => `/quotations?edit=${q.id}`
+    },
+    {
+        key: 'calls',
+        label: 'Calling Data',
+        icon: Phone,
+        title: (c) => c.partyName + (c.nickname ? ` (${c.nickname})` : ''),
+        subtitle: (c) => [c.contactPerson, c.mobileNumber, c.city, c.callDate].filter(Boolean).join(' · '),
+        link: (c) => `/calling-details?q=${encodeURIComponent(c.mobileNumber || c.partyName)}`
     },
     {
         key: 'events',

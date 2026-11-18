@@ -46,11 +46,16 @@ export default function Quotations() {
     const quotations = data?.quotations;
     const parties = data?.parties || [];
 
-    // ?new=1 and ?edit=<id> come from other pages (dashboard, search, party page).
+    // ?new=1, ?edit=<id> and ?pdf=<id> come from other pages (dashboard, search, party and salesperson pages).
     useEffect(() => {
         if (!data) return;
         const editId = searchParams.get('edit');
-        if (editId) {
+        const pdfId = searchParams.get('pdf');
+        if (pdfId) {
+            const found = data.quotations.find((q) => q.id === pdfId);
+            if (found) setPrinting({ data: found, download: true });
+            setSearchParams({}, { replace: true });
+        } else if (editId) {
             const found = data.quotations.find((q) => q.id === editId);
             if (found) setForm({ initial: found, editingId: found.id });
             setSearchParams({}, { replace: true });

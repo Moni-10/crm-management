@@ -20,7 +20,11 @@ const COLUMN_UPGRADES = [
     ['quotations', 'bank_details', 'TEXT NULL'],
     ['events', 'event_time', 'VARCHAR(5) NULL'],
     ['events', 'salesperson_id', 'VARCHAR(40) NULL'],
-    ['events', 'notes', 'TEXT NULL']
+    ['events', 'notes', 'TEXT NULL'],
+    ['calls', 'nickname', 'VARCHAR(150) NULL'],
+    ['calls', 'machine_number', 'VARCHAR(100) NULL'],
+    ['calls', 'address', 'TEXT NULL'],
+    ['calls', 'requirement', 'TEXT NULL']
 ];
 
 async function applyColumnUpgrades(conn, database) {

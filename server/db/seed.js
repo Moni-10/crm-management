@@ -103,7 +103,7 @@ const daysFromNow = (days) => {
     return date.toISOString().slice(0, 10);
 };
 
-const DATA_TABLES = ['quotation_items', 'quotations', 'events', 'machines', 'parties', 'salespersons', 'activity'];
+const DATA_TABLES = ['calls', 'quotation_items', 'quotations', 'events', 'machines', 'parties', 'salespersons', 'activity'];
 
 export async function clearData() {
     for (const table of DATA_TABLES) await pool.query(`DELETE FROM ${table}`);

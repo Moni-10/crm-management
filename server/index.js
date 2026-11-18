@@ -11,6 +11,7 @@ import { requireAdmin, requireAuth } from './auth/middleware.js';
 import activityRoutes from './routes/activity.js';
 import adminRoutes from './routes/admin.js';
 import authRoutes from './routes/auth.js';
+import callsRoutes from './routes/calls.js';
 import backupRoutes from './routes/backup.js';
 import { ensureCompanyRow, readCompany, updateCompany } from './routes/company.js';
 import crudRoutes from './routes/crud.js';
@@ -43,6 +44,7 @@ app.use('/api/backup', backupRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/admin', requireAdmin, adminRoutes);
+app.use('/api/calls', callsRoutes); // paged search + fast Excel import; must come before the generic /calls/:id routes
 app.use('/api', crudRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

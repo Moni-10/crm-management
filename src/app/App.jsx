@@ -18,6 +18,7 @@ import PartyDetail from '../pages/PartyDetail/PartyDetail';
 import Quotations from '../pages/Quotations/Quotations';
 import Reports from '../pages/Reports/Reports';
 import Salespersons from '../pages/Salespersons/Salespersons';
+import SalespersonDetail from '../pages/Salespersons/SalespersonDetail';
 import Search from '../pages/Search/Search';
 import Settings from '../pages/Settings/Settings';
 
@@ -61,6 +62,7 @@ function AppRoutes() {
                         <Route path="dashboard" element={<Navigate to="/" replace />} />
                         <Route path="search" element={<Search />} />
                         <Route path="salespersons" element={<Salespersons />} />
+                        <Route path="salespersons/:id" element={<SalespersonDetail />} />
                         <Route path="parties" element={<Parties />} />
                         <Route path="parties/:id" element={<PartyDetail />} />
                         <Route path="quotations" element={<Quotations />} />

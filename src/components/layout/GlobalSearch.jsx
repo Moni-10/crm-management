@@ -7,7 +7,7 @@ import { countResults, SEARCH_GROUPS } from '../../utils/searchGroups';
 const DEBOUNCE_MS = 250;
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
-// Search box in the top bar: searches salespersons, parties, machines, quotations and events.
+// Search box in the top bar: searches salespersons, parties, machines, quotations, calling data and events.
 // Press Ctrl+K (Cmd+K on Mac) from anywhere to jump into it.
 export default function GlobalSearch() {
     const navigate = useNavigate();
