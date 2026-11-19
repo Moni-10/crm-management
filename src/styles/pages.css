@@ -184,6 +184,10 @@ a.stat:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md);
 /* ---------- Settings: one card layout shared by every tab ---------- */
 .settings-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
 .settings-nav { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--topbar-h) + 24px); }
+.sales-team-roster { display: flex; align-items: center; gap: 22px; margin-bottom: 18px; padding: 17px 20px; border: 1px solid var(--border); border-radius: 15px; background: linear-gradient(110deg, var(--primary-soft), var(--surface) 42%); }
+.sales-roster-head { display: flex; align-items: center; gap: 11px; flex: none; padding-right: 22px; border-right: 1px solid var(--border); }.sales-roster-head>svg { width: 35px; height: 35px; padding: 8px; border-radius: 10px; background: var(--primary); color: var(--on-primary); }.sales-roster-head h2 { margin: 0; font-size: 14px; }.sales-roster-head p { margin: 3px 0 0; color: var(--text-3); font-size: 10px; }
+.sales-name-list { display: flex; flex-wrap: wrap; gap: 7px; }.sales-name-list span { padding: 6px 10px; border: 1px solid var(--border); border-radius: 99px; background: var(--surface); color: var(--text); font-size: 11px; font-weight: 600; }
+@media(max-width:700px){.sales-team-roster{align-items:flex-start;flex-direction:column}.sales-roster-head{width:100%;padding:0 0 13px;border-right:0;border-bottom:1px solid var(--border)}}
 .settings-nav button { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; border-radius: 10px; background: none; color: var(--text-2); font-size: 14.5px; font-weight: 500; text-align: left; }
 .settings-nav button:hover { background: var(--surface-3); color: var(--text); }
 .settings-nav button.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }

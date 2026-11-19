@@ -9,12 +9,17 @@ import { resources } from '../resources/index.js';
 const { salespersons, parties, machines, quotations, events } = resources;
 
 const SALESPEOPLE = [
-    ['Rahul Sharma', 'Rahul', '9810011001', 'rahul@mmw.in', 'Sales', 'EMP001'],
-    ['Amit Verma', 'Amit', '9810011002', 'amit@mmw.in', 'Sales', 'EMP002'],
-    ['Priya Singh', 'Priya', '9810011003', 'priya@mmw.in', 'Sales', 'EMP003'],
-    ['Karan Malhotra', 'Karan', '9810011004', 'karan@mmw.in', 'Export Sales', 'EMP004'],
-    ['Sunita Rao', 'Sunita', '9810011005', 'sunita@mmw.in', 'Service', 'EMP005'],
-    ['Vikram Chauhan', 'Vikky', '9810011006', 'vikram@mmw.in', 'Sales', 'EMP006']
+    ['Jaspal', 'Jaspal', '9810011020', 'jaspal@mmw.in', 'Sales', 'EMP201'],
+    ['Pooja', 'Pooja', '9810011021', 'pooja@mmw.in', 'Sales', 'EMP202'],
+    ['Aman', 'Aman', '9810011022', 'aman@mmw.in', 'Sales', 'EMP203'],
+    ['Neha Khan', 'Neha', '9810011023', 'neha.khan@mmw.in', 'Sales', 'EMP204'],
+    ['Neha Mishra', 'Neha', '9810011024', 'neha.mishra@mmw.in', 'Sales', 'EMP205'],
+    ['Muskan', 'Muskan', '9810011025', 'muskan@mmw.in', 'Sales', 'EMP206'],
+    ['Rajwant', 'Rajwant', '9810011026', 'rajwant@mmw.in', 'Sales', 'EMP207'],
+    ['Renu', 'Renu', '9810011027', 'renu@mmw.in', 'Sales', 'EMP208'],
+    ['Satish', 'Satish', '9810011028', 'satish@mmw.in', 'Sales', 'EMP209'],
+    ['Swati', 'Swati', '9810011029', 'swati@mmw.in', 'Sales', 'EMP210'],
+    ['Uma', 'Uma', '9810011030', 'uma@mmw.in', 'Sales', 'EMP211']
 ];
 
 // [company, contact, mobile, city, state, pincode, area, type, status, salesperson index]

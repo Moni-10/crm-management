@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     ArrowUpRight, BellRing, Building2, CalendarDays, ChartNoAxesColumn, Clock, DatabaseBackup, FilePlus2,
-    FileText, MapPin, Phone, PhoneCall, Plus, Settings, Star, Trophy, Users
+    FileText, MapPin, Phone, PhoneCall, Plus, Settings, Star, Trophy, Users, Mail, Edit2, Trash2
 } from 'lucide-react';
 import { activityApi, callsApi, eventsApi, partiesApi, quotationsApi, salespersonsApi } from '../../api';
 import { Avatar, Badge, EmptyState, ErrorState } from '../../components/ui';
@@ -14,6 +14,43 @@ import MiniCalendar from './MiniCalendar';
 import WeatherCard from './WeatherCard';
 
 const OFFICE_MAP = 'https://www.google.com/maps?q=28.66036,77.09717&z=15&output=embed';
+
+const COMPANY_INFO = {
+    name: 'Mohindra Mechanical Works',
+    owners: [
+        { id: 1, name: 'S. Mohinder Singh', designation: 'Founder', email: 'mohinder@mmw.in', phone: '9810011000', avatar: '👨‍💼' },
+        { id: 2, name: 'Azadvinder Singh', designation: 'Co-Founder', email: 'azad@mmw.in', phone: '9810011001', avatar: '👨‍💼' }
+    ],
+    departments: [
+        {
+            name: 'Technical',
+            icon: '💻',
+            employees: [
+                { id: 101, name: 'Vedant Tripathi', designation: 'Digital Marketing Expert', email: 'vedant@mmw.in', phone: '9810011010', avatar: '👨‍💻' },
+                { id: 102, name: 'Nishu Kashyap', designation: 'Full Stack Developer', email: 'nishu@mmw.in', phone: '9810011011', avatar: '👩‍💻' },
+                { id: 103, name: 'Laxmi Singh', designation: 'WordPress Developer', email: 'laxmi@mmw.in', phone: '9810011012', avatar: '👩‍💻' },
+                { id: 104, name: 'Bhupender Singh', designation: 'SEO Intern', email: 'bhupender@mmw.in', phone: '9810011013', avatar: '👨‍💻' }
+            ]
+        },
+        {
+            name: 'Sales',
+            icon: '📈',
+            employees: [
+                { id: 201, name: 'Jaspal', designation: 'Sales Manager', email: 'jaspal@mmw.in', phone: '9810011020', avatar: '👨‍💼' },
+                { id: 202, name: 'Pooja', designation: 'Sales Executive', email: 'pooja@mmw.in', phone: '9810011021', avatar: '👩‍💼' },
+                { id: 203, name: 'Aman', designation: 'Sales Executive', email: 'aman@mmw.in', phone: '9810011022', avatar: '👨‍💼' },
+                { id: 204, name: 'Neha Khan', designation: 'Sales Executive', email: 'neha.khan@mmw.in', phone: '9810011023', avatar: '👩‍💼' },
+                { id: 205, name: 'Neha Mishra', designation: 'Sales Executive', email: 'neha.mishra@mmw.in', phone: '9810011024', avatar: '👩‍💼' },
+                { id: 206, name: 'Muskan', designation: 'Sales Executive', email: 'muskan@mmw.in', phone: '9810011025', avatar: '👩‍💼' },
+                { id: 207, name: 'Rajwant', designation: 'Sales Executive', email: 'rajwant@mmw.in', phone: '9810011026', avatar: '👨‍💼' },
+                { id: 208, name: 'Renu', designation: 'Sales Executive', email: 'renu@mmw.in', phone: '9810011027', avatar: '👩‍💼' },
+                { id: 209, name: 'Satish', designation: 'Sales Executive', email: 'satish@mmw.in', phone: '9810011028', avatar: '👨‍💼' },
+                { id: 210, name: 'Swati', designation: 'Sales Executive', email: 'swati@mmw.in', phone: '9810011029', avatar: '👩‍💼' },
+                { id: 211, name: 'Uma', designation: 'Sales Executive', email: 'uma@mmw.in', phone: '9810011030', avatar: '👩‍💼' }
+            ]
+        }
+    ]
+};
 
 const ACTIVITY_ICONS = {
     party: Building2, salesperson: Users, quotation: FileText, call: Phone, event: CalendarDays,
@@ -201,24 +238,10 @@ export default function Dashboard() {
                         {totalPipeline === 0 ? (
                             <p className="muted">No quotations yet. Create one to start the pipeline.</p>
                         ) : (
-                            <>
-                                <div className="pipeline-total">
-                                    <strong>{totalPipeline}</strong><span className="muted">quotations, {formatCompactCurrency(view.openValue)} still open</span>
-                                </div>
-                                <div className="pipeline-bar dash-pipe" role="img" aria-label={view.pipeline.map((p) => `${p.status}: ${p.count}`).join(', ')}>
-                                    {view.pipeline.filter((p) => p.count > 0).map((p) => (
-                                        <span key={p.status} style={{ flexGrow: p.count, background: p.tone }} />
-                                    ))}
-                                </div>
-                                <div className="pipeline-legend dash-legend">
-                                    {view.pipeline.map((p) => (
-                                        <div key={p.status} style={{ '--tone': p.tone }}>
-                                            <strong>{p.count}</strong>
-                                            <span>{p.status}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
+                            <div className="pipeline-flow">
+                                <div className="pipeline-overview"><span className="pipeline-kicker">Live quotation overview</span><strong>{formatCompactCurrency(view.openValue)}</strong><p>Open pipeline value</p><div className="pipeline-total-line"><FileText /><span><b>{totalPipeline}</b> total quotations</span></div><Link to="/quotations" className="pipeline-action">Manage quotations <ArrowUpRight /></Link></div>
+                                <div className="pipeline-stages" aria-label={view.pipeline.map((p) => `${p.status}: ${p.count}`).join(', ')}>{view.pipeline.map((p, index) => <div className="pipeline-stage" key={p.status} style={{ '--tone': p.tone }}><span className="pipeline-step">0{index + 1}</span><div className="pipeline-stage-copy"><div><b>{p.status}</b><span>{Math.round((p.count / totalPipeline) * 100)}%</span></div><i><span style={{ width: `${(p.count / totalPipeline) * 100}%` }} /></i></div><strong>{p.count}</strong></div>)}</div>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -253,9 +276,12 @@ export default function Dashboard() {
                         <Link to="/calling-details" className="card-link">Calling Data <ArrowUpRight /></Link>
                     </div>
                     {calls.items.length === 0 ? (
-                        <EmptyState icon={PhoneCall} title="No calls yet" action={<Link to="/calling-details?new=1" className="btn btn-primary"><Plus /> Log a call</Link>}>
-                            Log calls or import your Excel sheet in Calling Data.
-                        </EmptyState>
+                        <div className="quick-actions-grid">
+                            <Link to="/parties?add=1" className="quick-action tone-blue"><span><Building2 /></span><div><strong>Add new party</strong><small>Create a customer profile</small></div><ArrowUpRight /></Link>
+                            <Link to="/quotations?new=1" className="quick-action tone-orange"><span><FilePlus2 /></span><div><strong>New quotation</strong><small>Prepare a sales quote</small></div><ArrowUpRight /></Link>
+                            <Link to="/calling-details?new=1" className="quick-action tone-green"><span><PhoneCall /></span><div><strong>Log a call</strong><small>Record customer discussion</small></div><ArrowUpRight /></Link>
+                            <Link to="/calendar" className="quick-action tone-purple"><span><CalendarDays /></span><div><strong>Schedule event</strong><small>Add meeting or reminder</small></div><ArrowUpRight /></Link>
+                        </div>
                     ) : (
                         <ul className="call-list">
                             {calls.items.map((c) => (
@@ -334,6 +360,79 @@ export default function Dashboard() {
                                 })}
                             </ul>
                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Company Organization Section */}
+            <div className="dash-grid dashboard-organization" aria-hidden="true">
+                <div className="col-12 card dash-card">
+                    <div className="card-head">
+                        <h3><Building2 aria-hidden="true" /> Company Organization</h3>
+                        <span style={{ color: 'var(--text-3)', fontSize: '14px' }}>{COMPANY_INFO.name}</span>
+                    </div>
+                    <div className="card-body">
+                        {/* Owners Section */}
+                        <div className="org-section">
+                            <h4 className="org-title">👑 Company Owners</h4>
+                            <div className="org-grid">
+                                {COMPANY_INFO.owners.map((owner) => (
+                                    <div key={owner.id} className="member-card">
+                                        <div className="member-avatar" style={{ fontSize: '32px' }}>{owner.avatar}</div>
+                                        <div className="member-details">
+                                            <div className="member-name">{owner.name}</div>
+                                            <div className="member-role">{owner.designation}</div>
+                                            <div className="member-contact">
+                                                <a href={`mailto:${owner.email}`} className="contact-link" title="Email">
+                                                    <Mail size={14} /> {owner.email}
+                                                </a>
+                                            </div>
+                                            <div className="member-contact">
+                                                <a href={`tel:${owner.phone}`} className="contact-link" title="Phone">
+                                                    <Phone size={14} /> {owner.phone}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div className="member-actions">
+                                            <button type="button" className="icon-btn sm" title="Edit"><Edit2 size={16} /></button>
+                                            <button type="button" className="icon-btn sm danger" title="Delete"><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Departments Section */}
+                        {COMPANY_INFO.departments.map((dept) => (
+                            <div key={dept.name} className="org-section">
+                                <h4 className="org-title">{dept.icon} {dept.name} Department ({dept.employees.length})</h4>
+                                <div className="org-grid">
+                                    {dept.employees.map((emp) => (
+                                        <div key={emp.id} className="member-card">
+                                            <div className="member-avatar" style={{ fontSize: '28px' }}>{emp.avatar}</div>
+                                            <div className="member-details">
+                                                <div className="member-name">{emp.name}</div>
+                                                <div className="member-role">{emp.designation}</div>
+                                                <div className="member-contact">
+                                                    <a href={`mailto:${emp.email}`} className="contact-link" title="Email">
+                                                        <Mail size={14} /> {emp.email}
+                                                    </a>
+                                                </div>
+                                                <div className="member-contact">
+                                                    <a href={`tel:${emp.phone}`} className="contact-link" title="Phone">
+                                                        <Phone size={14} /> {emp.phone}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div className="member-actions">
+                                                <button type="button" className="icon-btn sm" title="Edit"><Edit2 size={16} /></button>
+                                                <button type="button" className="icon-btn sm danger" title="Delete"><Trash2 size={16} /></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

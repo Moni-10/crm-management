@@ -1,0 +1,19 @@
+/* Contact strip matching the supplied navy/orange footer reference. */
+.team-footer {
+    position: relative; isolation: isolate; display: flex; align-items: center; gap: 0;
+    min-height: 44px; overflow: hidden; padding: 0 21px; border-radius: 0;
+    background: #052c5e; color: #fff;
+}
+.team-footer::after {
+    content: ''; position: absolute; z-index: -1; inset: 0 0 0 auto; width: 27%;
+    background: #ff7900; clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+}
+.team-footer span { display: flex; align-items: center; gap: 10px; width: auto; padding-right: 27px; font-size: 11px; white-space: nowrap; }
+.team-footer span + span::before { content: ''; width: 1px; height: 23px; margin-right: 23px; background: rgba(255,255,255,.72); }
+.team-footer svg { width: 17px; }
+.team-footer strong { margin-left: auto; padding: 0 12px 0 45px; font-size: 12px; white-space: nowrap; }
+@media (max-width: 850px) {
+    .team-footer::after { display: none; }
+    .team-footer strong { padding-left: 0; }
+    .team-footer span + span::before { display: none; }
+}

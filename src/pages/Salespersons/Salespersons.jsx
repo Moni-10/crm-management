@@ -11,6 +11,7 @@ import { logoFileToDataUrl } from '../../utils/image';
 import { showToast, whatsappUrl } from '../../utils/helpers';
 
 const EMPTY = { fullName: '', nickname: '', mobile: '', whatsapp: '', email: '', department: '', employeeId: '', photo: '', notes: '' };
+const SALES_DEPARTMENT_NAMES = ['Jaspal', 'Pooja', 'Aman', 'Neha Khan', 'Neha Mishra', 'Muskan', 'Rajwant', 'Renu', 'Satish', 'Swati', 'Uma'];
 
 function SalespersonForm({ person, onClose, onSaved }) {
     const editing = Boolean(person);
@@ -158,6 +159,11 @@ export default function Salespersons() {
                 <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>
                 <button type="button" className="btn btn-primary" onClick={() => setFormPerson(true)}><Plus /> Add salesperson</button>
             </PageHeader>
+
+            <section className="sales-team-roster">
+                <div className="sales-roster-head"><Users /><div><h2>Sales Department</h2><p>{SALES_DEPARTMENT_NAMES.length} team members</p></div></div>
+                <div className="sales-name-list">{SALES_DEPARTMENT_NAMES.map((name) => <span key={name}>{name}</span>)}</div>
+            </section>
 
             {salespersons && salespersons.length > 0 && (
                 <div className="toolbar">

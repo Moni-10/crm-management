@@ -1,0 +1,36 @@
+/* Full-width stacked team sections and improved banner crop. */
+.team-banner {
+    position: relative; min-height: 245px; height: 245px; aspect-ratio: auto; align-items: flex-start; padding-top: 34px;
+    background-size: cover; background-position: center top; background-repeat: no-repeat;
+}
+.team-banner::before { content: ''; position: absolute; inset: 0; pointer-events: none; }
+.team-board { grid-template-columns: 1fr; }
+.team-panel > header h2,.team-panel > header > div > svg { color: #fff; }
+.owner-panel,.department-panel,.team-highlights { grid-column: 1; width: 100%; }
+.owner-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.owner-list article { min-height: 130px; grid-template-columns: 90px minmax(0, 1fr); align-items: center; }
+.owner-list img { width: 86px; height: 100px; }
+.owner-list .team-actions { opacity: 1; }
+.team-highlights { grid-template-columns: 1fr 1fr; }
+.department-panel table { table-layout: auto; }
+.department-panel th,.department-panel td { padding: 10px 12px; }
+.department-panel td:nth-child(4) { color: var(--text); font-weight: 700; }
+.table-avatar { display: grid; place-items: center; width: 38px; height: 38px; overflow: hidden; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.table-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.team-photo-field { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+.team-photo-preview { display: grid; place-items: center; width: 62px; height: 62px; overflow: hidden; border-radius: 50%; background: var(--primary-soft); color: var(--primary); }
+.team-photo-preview img { width: 100%; height: 100%; object-fit: cover; object-position: top; }.team-photo-preview svg { width: 24px; }
+.team-photo-field label { color: var(--text-2); font-size: 11px; font-weight: 700; }.team-photo-field input { position: absolute; width: 1px; height: 1px; opacity: 0; }.team-photo-field label span { display: block; width: max-content; margin-top: 7px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--primary); cursor: pointer; }
+@media(max-width:700px){.owner-list{grid-template-columns:1fr}.team-highlights{grid-template-columns:1fr}.team-banner{min-height:300px;aspect-ratio:auto;background-size:auto 100%;background-position:62% top}.team-banner>div{padding:12px;background:#ffffffe8;border-radius:12px}}
+
+/* MMW brand palette: navy blue and red only. */
+.team-page { --orange: #bd1622; }
+.team-banner span { color: #bd1622; }
+.team-kpis > div { background: linear-gradient(135deg, #073b73, #05264c); }
+.team-kpis > div:nth-child(2) { background: linear-gradient(135deg, #d72a36, #a90f1a); }
+.team-kpis > div:nth-child(3) { background: linear-gradient(135deg, #1265a8, #073b73); }
+.team-kpis > div:nth-child(4) { background: linear-gradient(135deg, #0b4e8a, #05264c); }
+.owner-list b { background: #bd1622; }
+.team-highlights h3 svg,.team-highlights p svg { color: #bd1622; }
+.app-contact-footer::after { background: #bd1622; }
+.profile-cover-copy > span { color: #bd1622; }

@@ -9,6 +9,8 @@ import { ThemeProvider } from '../context/ThemeContext';
 import Backup from '../pages/Backup/Backup';
 import Calendar from '../pages/Calendar/Calendar';
 import CallingDetails from '../pages/CallingDetails/CallingDetails';
+import CompanyTeam from '../pages/Company/CompanyTeam';
+import CompanyProfile from '../pages/Company/CompanyProfile';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import FollowUps from '../pages/FollowUps/FollowUps';
 import Login from '../pages/Login/Login';
@@ -60,6 +62,8 @@ function AppRoutes() {
                     <Route element={<Layout />}>
                         <Route index element={<Dashboard />} />
                         <Route path="dashboard" element={<Navigate to="/" replace />} />
+                        <Route path="company" element={<CompanyTeam />} />
+                        <Route path="company-profile" element={<CompanyProfile />} />
                         <Route path="search" element={<Search />} />
                         <Route path="salespersons" element={<Salespersons />} />
                         <Route path="salespersons/:id" element={<SalespersonDetail />} />
