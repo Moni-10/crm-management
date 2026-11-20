@@ -32,7 +32,7 @@ const emptyForm = () => ({
     machineInterest: '',
     machineNumber: '',
     requirement: '',
-    callType: 'Follow-up',
+    callType: 'Visited',
     notes: '',
     handledBy: '',
     status: 'completed'
@@ -79,7 +79,7 @@ const FORM_FIELDS = [
     { key: 'machineInterest', label: 'Machine Interest' },
     { key: 'machineNumber', label: 'Machine Number' },
     { key: 'requirement', label: 'Requirement' },
-    { key: 'callType', label: 'Call Type', options: ['Sales', 'Follow-up', 'Support'] },
+    { key: 'callType', label: 'Call Type', options: ['Visited', 'Interested', 'Not Interested', 'Final Order'] },
     { key: 'handledBy', label: 'Handled By (salesperson)', list: 'call-salespersons' },
 ];
 
@@ -102,7 +102,7 @@ const HEADER_ALIASES = {
     machineInterest: ['machine interest', 'machine', 'interest', 'machine required', 'machine name'],
     requirement: ['requirement', 'requirements', 'client requirement', 'need', 'needs', 'enquiry', 'inquiry'],
     machineNumber: ['machine number', 'machine no', 'model', 'model number', 'model no', 'machine model'],
-    callType: ['call type', 'type'],
+    callType: ['call type', 'type', 'visited', 'interested', 'not interested', 'final order', 'status'],
     handledBy: ['handled by', 'salesperson', 'sales person', 'handledby'],
     notes: ['notes', 'note', 'remarks', 'remark', 'comments'],
     status: ['status'],
@@ -451,9 +451,10 @@ export default function CallingDetails() {
                 </select>
                 <select className="input" value={filterType} onChange={withPageReset(setFilterType)} aria-label="Filter by call type">
                     <option value="">All Call Types</option>
-                    <option>Sales</option>
-                    <option>Follow-up</option>
-                    <option>Support</option>
+                    <option>Visited</option>
+                    <option>Interested</option>
+                    <option>Not Interested</option>
+                    <option>Final Order</option>
                 </select>
             </div>
 

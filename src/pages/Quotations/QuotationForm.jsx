@@ -87,6 +87,14 @@ export default function QuotationForm({ initial, parties, editing, onSave, onCan
                         <Field label="Quotation number" required error={errors.quotationNumber} htmlFor="q-number">
                             <input id="q-number" className="input" value={form.quotationNumber} onChange={set('quotationNumber')} />
                         </Field>
+                        <Field label="Company" htmlFor="q-issuer">
+                            <select id="q-issuer" className="select" value={form.companyId || 1} onChange={(e) => setForm((f) => ({ ...f, companyId: Number(e.target.value) }))}>
+                                <option value={1}>Mohindra Mechanical Works</option>
+                                <option value={2}>Mohindra Engineering Company</option>
+                                <option value={3}>Roto N Print Pack Industries</option>
+                                <option value={4}>Azad Paper Industries</option>
+                            </select>
+                        </Field>
                         <Field label="Date" htmlFor="q-date"><input id="q-date" className="input" type="date" value={form.quotationDate} onChange={set('quotationDate')} /></Field>
                         <Field label="Valid until" htmlFor="q-valid"><input id="q-valid" className="input" type="date" value={form.validityDate} onChange={set('validityDate')} /></Field>
                         <Field label="Status" htmlFor="q-status">
