@@ -6,6 +6,7 @@ import EventModal from '../../components/events/EventModal';
 import { Badge, EmptyState, ErrorState, Loading, PageHeader } from '../../components/ui';
 import { useLoad } from '../../hooks/useLoad';
 import { formatDate, showToast, todayIso, whatsappUrl } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
 
 const SECTIONS = [
     { id: 'overdue', label: 'Overdue', tone: 'danger' },
@@ -16,6 +17,7 @@ const SECTIONS = [
 
 // Follow-ups come from two places: scheduled follow-up events, and parties marked "Follow-up" or with a follow-up date.
 export default function FollowUps() {
+    const { can } = useAuth();
     const { data, loading, error, reload } = useLoad(async () => {
         const [events, parties, salespersons] = await Promise.all([eventsApi.list(), partiesApi.list(), salespersonsApi.list()]);
         return { events, parties, salespersons };
@@ -58,7 +60,7 @@ export default function FollowUps() {
     return (
         <div>
             <PageHeader title="Follow-ups" subtitle={`${items.length} waiting`}>
-                <button type="button" className="btn btn-primary" onClick={() => setModal({ defaults: { eventType: 'followup' } })}><Plus /> Schedule follow-up</button>
+                {can('calendar.create') && <button type="button" className="btn btn-primary" onClick={() => setModal({ defaults: { eventType: 'followup' } })}><Plus /> Schedule follow-up</button>}
             </PageHeader>
 
             {items.length === 0 ? (
@@ -92,8 +94,8 @@ export default function FollowUps() {
                                                 <div className="row-actions">
                                                     {item.party && <a className="icon-btn" href={`tel:${item.party.primaryMobile}`} aria-label={`Call ${item.party.companyName}`}><Phone /></a>}
                                                     {item.party && <a className="icon-btn" href={whatsappUrl(item.party.whatsappNumber || item.party.primaryMobile)} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${item.party.companyName}`}><MessageCircle /></a>}
-                                                    {item.kind === 'event' && <button type="button" className="icon-btn" onClick={() => setModal({ event: item.source })} aria-label="Edit"><Pencil /></button>}
-                                                    <button type="button" className="btn btn-sm" onClick={() => markDone(item)}><Check /> Done</button>
+                                                    {item.kind === 'event' && can('calendar.edit') && <button type="button" className="icon-btn" onClick={() => setModal({ event: item.source })} aria-label="Edit"><Pencil /></button>}
+                                                    {can('calendar.edit') && <button type="button" className="btn btn-sm" onClick={() => markDone(item)}><Check /> Done</button>}
                                                 </div>
                                             </li>
                                         ))}

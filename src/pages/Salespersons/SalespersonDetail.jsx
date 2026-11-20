@@ -8,6 +8,7 @@ import { useLoad } from '../../hooks/useLoad';
 import { formatCompactCurrency, formatCurrency, formatDate, mailtoUrl, showToast, whatsappUrl } from '../../utils/helpers';
 import ClientForm from './ClientForm';
 import ClientShareMenu from './ClientShareMenu';
+import { useAuth } from '../../context/AuthContext';
 
 // One salesperson's work in one place: every client they called (with the machine the client wants,
 // machine number and contact details) and every quotation they made. Calls are matched on "Handled By"
@@ -33,6 +34,7 @@ const contact = (number, kind) => {
 };
 
 export default function SalespersonDetail() {
+    const { can } = useAuth();
     const { id } = useParams();
     const { data, loading, error, reload } = useLoad(async () => {
         const [person, quotations] = await Promise.all([salespersonsApi.get(id), quotationsApi.list()]);
@@ -113,7 +115,7 @@ export default function SalespersonDetail() {
                         </div>
                     </div>
                 </div>
-                <button type="button" className="btn btn-primary" onClick={addClient}><Plus /> Add client</button>
+                {can('calls.create') && <button type="button" className="btn btn-primary" onClick={addClient}><Plus /> Add client</button>}
             </section>
 
             <div className="sp-stats">
@@ -153,7 +155,7 @@ export default function SalespersonDetail() {
                             <EmptyState
                                 icon={PhoneCall}
                                 title={search ? 'No client matches' : 'No client calls yet'}
-                                action={!search && <button type="button" className="btn btn-primary" onClick={addClient}><Plus /> Add client</button>}
+                                action={can('calls.create') && !search && <button type="button" className="btn btn-primary" onClick={addClient}><Plus /> Add client</button>}
                             >
                                 {search ? 'Try a different search.' : `Calls show here when "Handled By" is ${person.fullName}${person.nickname ? ` or ${person.nickname}` : ''} in Calling Data.`}
                             </EmptyState>
@@ -198,8 +200,8 @@ export default function SalespersonDetail() {
                                                 <td className="sheet-notes" title={c.notes}>{c.notes || '—'}</td>
                                                 <td className="sheet-actions">
                                                     <ClientShareMenu client={c} salesperson={person} quotations={data.quotations || []} />
-                                                    <button type="button" className="icon-btn sm" onClick={() => setFormClient(c)} title="Edit" aria-label={`Edit ${c.partyName}`}><Pencil size={16} /></button>
-                                                    <button type="button" className="icon-btn sm danger" onClick={() => removeClient(c)} title="Delete" aria-label={`Delete ${c.partyName}`}><Trash2 size={16} /></button>
+                                                    {can('calls.edit') && <button type="button" className="icon-btn sm" onClick={() => setFormClient(c)} title="Edit" aria-label={`Edit ${c.partyName}`}><Pencil size={16} /></button>}
+                                                    {can('calls.delete') && <button type="button" className="icon-btn sm danger" onClick={() => removeClient(c)} title="Delete" aria-label={`Delete ${c.partyName}`}><Trash2 size={16} /></button>}
                                                 </td>
                                             </tr>
                                         ))}

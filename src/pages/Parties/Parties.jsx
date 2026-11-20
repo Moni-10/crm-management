@@ -9,6 +9,7 @@ import { PARTY_COLUMNS } from '../../config/columns';
 import { useLoad } from '../../hooks/useLoad';
 import { showToast } from '../../utils/helpers';
 import PartyForm, { PARTY_STATUSES } from './PartyForm';
+import { useAuth } from '../../context/AuthContext';
 
 const SORTS = {
     companyName: (p) => p.companyName.toLowerCase(),
@@ -31,6 +32,7 @@ function SortHeader({ label, sortKey, sort, onSort, className }) {
 }
 
 export default function Parties() {
+    const { can } = useAuth();
     const navigate = useNavigate();
     const confirm = useConfirm();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -101,13 +103,15 @@ export default function Parties() {
     return (
         <div>
             <PageHeader title="Parties" subtitle={parties ? `${parties.length} customers, prospects and dealers` : ''}>
+                {can('parties.export') && (
                 <ExportButton
                     filename="parties"
                     count={visible.length}
                     getSheets={() => [{ name: 'Parties', columns: PARTY_COLUMNS, records: visible }]}
                 />
-                <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>
-                <button type="button" className="btn btn-primary" onClick={() => setFormParty(true)}><Plus /> Add party</button>
+                )}
+                {can('parties.import') && <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>}
+                {can('parties.create') && <button type="button" className="btn btn-primary" onClick={() => setFormParty(true)}><Plus /> Add party</button>}
             </PageHeader>
 
             <div className="toolbar">
@@ -133,7 +137,7 @@ export default function Parties() {
                     <EmptyState
                         icon={Building2}
                         title={hasFilters ? 'No parties match' : 'No parties yet'}
-                        action={!hasFilters && <button type="button" className="btn btn-primary" onClick={() => setFormParty(true)}><Plus /> Add your first party</button>}
+                        action={can('parties.create') && !hasFilters && <button type="button" className="btn btn-primary" onClick={() => setFormParty(true)}><Plus /> Add your first party</button>}
                     >
                         {hasFilters ? 'Try a different search or clear the filters.' : 'Parties are your customers, prospects and dealers.'}
                     </EmptyState>
@@ -167,8 +171,8 @@ export default function Parties() {
                                         <td data-label="Machines" className="num">{p.machines.length}</td>
                                         <td className="actions" onClick={(e) => e.stopPropagation()}>
                                             <div className="row-actions">
-                                                <button type="button" className="icon-btn" onClick={() => setFormParty(p)} aria-label={`Edit ${p.companyName}`}><Pencil /></button>
-                                                <button type="button" className="icon-btn danger" onClick={() => remove(p)} aria-label={`Delete ${p.companyName}`}><Trash2 /></button>
+                                                {can('parties.edit') && <button type="button" className="icon-btn" onClick={() => setFormParty(p)} aria-label={`Edit ${p.companyName}`}><Pencil /></button>}
+                                                {can('parties.delete') && <button type="button" className="icon-btn danger" onClick={() => remove(p)} aria-label={`Delete ${p.companyName}`}><Trash2 /></button>}
                                             </div>
                                         </td>
                                     </tr>

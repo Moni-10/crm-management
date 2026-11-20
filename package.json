@@ -4,16 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n web,api -c cyan,green \"vite\" \"node --watch server/index.js\"",
+    "dev": "concurrently -k -n web,api -c cyan,green \"vite\" \"npm run dev:api\"",
     "dev:web": "vite",
-    "dev:api": "node --watch server/index.js",
+    "dev:api": "npm run migrate && node --watch server/index.js",
     "start": "node server/index.js",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "seed": "node server/db/seed.js",
     "setup": "node scripts/setup.js",
-    "db:import": "node server/db/import-dump.js"
+    "db:import": "node server/db/import-dump.js",
+    "migrate": "node server/db/run-migrations.js",
+    "migrate:status": "node server/db/run-migrations.js status",
+    "import:leads": "node server/db/import-leads.js",
+    "user:create": "node scripts/create-user.js",
+    "db:backup": "node scripts/backup-db.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -37,5 +42,8 @@
     "concurrently": "^10.0.6",
     "oxlint": "^1.88.0",
     "vite": "^8.3.4"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

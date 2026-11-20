@@ -13,6 +13,7 @@ import CompanyTeam from '../pages/Company/CompanyTeam';
 import CompanyProfile from '../pages/Company/CompanyProfile';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import FollowUps from '../pages/FollowUps/FollowUps';
+import Leads from '../pages/Leads/Leads';
 import Login from '../pages/Login/Login';
 import Machines from '../pages/Machines/Machines';
 import Parties from '../pages/Parties/Parties';
@@ -22,7 +23,9 @@ import Reports from '../pages/Reports/Reports';
 import Salespersons from '../pages/Salespersons/Salespersons';
 import SalespersonDetail from '../pages/Salespersons/SalespersonDetail';
 import Search from '../pages/Search/Search';
+import Roles from '../pages/Roles/Roles';
 import Settings from '../pages/Settings/Settings';
+import Users from '../pages/Users/Users';
 
 const centered = {
     display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
@@ -53,6 +56,18 @@ function RequireAuth() {
     return <Outlet />;
 }
 
+// Shows the page only when the role allows it (the server enforces the same rule on the data).
+function Guard({ perm, children }) {
+    const { can } = useAuth();
+    if (can(perm)) return children;
+    return (
+        <div style={{ ...centered, minHeight: '50vh' }}>
+            <h2>No access</h2>
+            <p style={{ maxWidth: 420 }}>Your role does not include this page. Ask an admin to grant you access.</p>
+        </div>
+    );
+}
+
 function AppRoutes() {
     return (
         <BrowserRouter>
@@ -62,21 +77,24 @@ function AppRoutes() {
                     <Route element={<Layout />}>
                         <Route index element={<Dashboard />} />
                         <Route path="dashboard" element={<Navigate to="/" replace />} />
-                        <Route path="company" element={<CompanyTeam />} />
-                        <Route path="company-profile" element={<CompanyProfile />} />
+                        <Route path="company" element={<Guard perm="company.view"><CompanyTeam /></Guard>} />
+                        <Route path="company-profile" element={<Guard perm="company.view"><CompanyProfile /></Guard>} />
                         <Route path="search" element={<Search />} />
-                        <Route path="salespersons" element={<Salespersons />} />
-                        <Route path="salespersons/:id" element={<SalespersonDetail />} />
-                        <Route path="parties" element={<Parties />} />
-                        <Route path="parties/:id" element={<PartyDetail />} />
-                        <Route path="quotations" element={<Quotations />} />
-                        <Route path="machines" element={<Machines />} />
-                        <Route path="calling-details" element={<CallingDetails />} />
-                        <Route path="calendar" element={<Calendar />} />
-                        <Route path="followups" element={<FollowUps />} />
-                        <Route path="reports" element={<Reports />} />
-                        <Route path="backup" element={<Backup />} />
+                        <Route path="salespersons" element={<Guard perm="salespersons.view"><Salespersons /></Guard>} />
+                        <Route path="salespersons/:id" element={<Guard perm="salespersons.view"><SalespersonDetail /></Guard>} />
+                        <Route path="parties" element={<Guard perm="parties.view"><Parties /></Guard>} />
+                        <Route path="parties/:id" element={<Guard perm="parties.view"><PartyDetail /></Guard>} />
+                        <Route path="quotations" element={<Guard perm="quotations.view"><Quotations /></Guard>} />
+                        <Route path="machines" element={<Guard perm="machines.view"><Machines /></Guard>} />
+                        <Route path="calling-details" element={<Guard perm="calls.view"><CallingDetails /></Guard>} />
+                        <Route path="leads" element={<Guard perm="leads.view"><Leads /></Guard>} />
+                        <Route path="calendar" element={<Guard perm="calendar.view"><Calendar /></Guard>} />
+                        <Route path="followups" element={<Guard perm="followups.view"><FollowUps /></Guard>} />
+                        <Route path="reports" element={<Guard perm="reports.view"><Reports /></Guard>} />
+                        <Route path="backup" element={<Guard perm="backup.view"><Backup /></Guard>} />
                         <Route path="settings" element={<Settings />} />
+                        <Route path="users" element={<Guard perm="users.manage"><Users /></Guard>} />
+                        <Route path="roles" element={<Guard perm="roles.manage"><Roles /></Guard>} />
                     </Route>
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

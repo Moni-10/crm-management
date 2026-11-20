@@ -1,11 +1,12 @@
 import { Router } from 'express';
+import { requirePermission } from '../auth/access.js';
 import { logActivity } from '../lib/activity.js';
 import { resources } from '../resources/index.js';
 
 const router = Router();
 
 // Full export: { exportedAt, salespersons: [], parties: [], ... }
-router.get('/', async (req, res, next) => {
+router.get('/', requirePermission('backup.view'), async (req, res, next) => {
     try {
         const data = { exportedAt: new Date().toISOString() };
         for (const [name, resource] of Object.entries(resources)) {
@@ -19,7 +20,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Import: records are upserted by id, so importing the same file twice is safe.
-router.post('/import', async (req, res, next) => {
+router.post('/import', requirePermission('backup.import'), async (req, res, next) => {
     try {
         const payload = req.body || {};
         const summary = {};

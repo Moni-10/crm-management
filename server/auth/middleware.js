@@ -17,7 +17,7 @@ export async function requireAuth(req, res, next) {
         }
 
         const user = await findUserById(claims.sub);
-        if (!user || passwordVersion(user) !== claims.pv) {
+        if (!user || !user.active || passwordVersion(user) !== claims.pv) {
             throw new HttpError(401, 'Your session has expired. Please log in again');
         }
         req.user = user;

@@ -8,6 +8,7 @@ import { Badge, EmptyState, ErrorState, Field, Loading, Modal, PageHeader, Searc
 import { MACHINE_COLUMNS } from '../../config/columns';
 import { useLoad } from '../../hooks/useLoad';
 import { formatDate, showToast } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
 
 const EMPTY = { name: '', category: '', model: '', quantity: 1, purchaseDate: '', purchaseStatus: 'Purchased', partyId: '' };
 
@@ -73,6 +74,7 @@ function MachineForm({ machine, parties, onClose, onSaved }) {
 }
 
 export default function Machines() {
+    const { can } = useAuth();
     const confirm = useConfirm();
     const { data, loading, error, reload } = useLoad(async () => {
         const [machines, parties] = await Promise.all([machinesApi.list(), partiesApi.list()]);
@@ -124,9 +126,9 @@ export default function Machines() {
     return (
         <div>
             <PageHeader title="Machines" subtitle={machines ? `${machines.length} records across ${groups.length} machine types` : ''}>
-                <ExportButton filename="machines" count={visible.length} getSheets={() => [{ name: 'Machines', columns: MACHINE_COLUMNS, records: visible }]} />
-                <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>
-                <button type="button" className="btn btn-primary" onClick={() => setFormMachine(true)}><Plus /> Add machine</button>
+                {can('machines.export') && <ExportButton filename="machines" count={visible.length} getSheets={() => [{ name: 'Machines', columns: MACHINE_COLUMNS, records: visible }]} />}
+                {can('machines.import') && <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>}
+                {can('machines.create') && <button type="button" className="btn btn-primary" onClick={() => setFormMachine(true)}><Plus /> Add machine</button>}
             </PageHeader>
 
             <div className="toolbar">
@@ -145,7 +147,7 @@ export default function Machines() {
                     <EmptyState
                         icon={Cog}
                         title={query ? 'No machines match' : 'No machines yet'}
-                        action={!query && <button type="button" className="btn btn-primary" onClick={() => setFormMachine(true)}><Plus /> Add a machine</button>}
+                        action={can('machines.create') && !query && <button type="button" className="btn btn-primary" onClick={() => setFormMachine(true)}><Plus /> Add a machine</button>}
                     >
                         {query ? 'Try a different search.' : 'Record which machines each party has bought.'}
                     </EmptyState>
@@ -169,8 +171,8 @@ export default function Machines() {
                                         {r.partyId ? <Link to={`/parties/${r.partyId}`}>{r.partyName}</Link> : <span className="muted">In stock</span>}
                                         <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <span className="muted" style={{ marginRight: 6 }}>x {r.quantity}</span>
-                                            <button type="button" className="icon-btn sm" onClick={() => setFormMachine(r)} aria-label={`Edit ${r.name}`}><Pencil /></button>
-                                            <button type="button" className="icon-btn sm danger" onClick={() => remove(r)} aria-label={`Delete ${r.name}`}><Trash2 /></button>
+                                            {can('machines.edit') && <button type="button" className="icon-btn sm" onClick={() => setFormMachine(r)} aria-label={`Edit ${r.name}`}><Pencil /></button>}
+                                            {can('machines.delete') && <button type="button" className="icon-btn sm danger" onClick={() => remove(r)} aria-label={`Delete ${r.name}`}><Trash2 /></button>}
                                         </span>
                                     </div>
                                 ))}
@@ -193,8 +195,8 @@ export default function Machines() {
                                         <td data-label="Purchased">{formatDate(m.purchaseDate) || '-'}</td>
                                         <td className="actions">
                                             <div className="row-actions">
-                                                <button type="button" className="icon-btn" onClick={() => setFormMachine(m)} aria-label={`Edit ${m.name}`}><Pencil /></button>
-                                                <button type="button" className="icon-btn danger" onClick={() => remove(m)} aria-label={`Delete ${m.name}`}><Trash2 /></button>
+                                                {can('machines.edit') && <button type="button" className="icon-btn" onClick={() => setFormMachine(m)} aria-label={`Edit ${m.name}`}><Pencil /></button>}
+                                                {can('machines.delete') && <button type="button" className="icon-btn danger" onClick={() => remove(m)} aria-label={`Delete ${m.name}`}><Trash2 /></button>}
                                             </div>
                                         </td>
                                     </tr>

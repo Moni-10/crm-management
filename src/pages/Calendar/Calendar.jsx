@@ -7,6 +7,7 @@ import { Badge, EmptyState, ErrorState, Loading, PageHeader, useConfirm } from '
 import { useLoad } from '../../hooks/useLoad';
 import { formatDate, showToast, todayIso } from '../../utils/helpers';
 import { buildMonthDays } from '../Dashboard/MiniCalendar';
+import { useAuth } from '../../context/AuthContext';
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const CHIPS_PER_DAY = 2;
@@ -14,6 +15,7 @@ const CHIPS_PER_DAY = 2;
 const byTime = (a, b) => (a.eventTime || '99:99').localeCompare(b.eventTime || '99:99');
 
 export default function Calendar() {
+    const { can } = useAuth();
     const confirm = useConfirm();
     const [searchParams] = useSearchParams();
     const initialDate = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.get('date') || '') ? searchParams.get('date') : todayIso();
@@ -75,7 +77,7 @@ export default function Calendar() {
     return (
         <div>
             <PageHeader title="Calendar" subtitle="Meetings, calls, visits and deliveries">
-                <button type="button" className="btn btn-primary" onClick={() => setModal({ defaults: { date: selected } })}><Plus /> Add event</button>
+                {can('calendar.create') && <button type="button" className="btn btn-primary" onClick={() => setModal({ defaults: { date: selected } })}><Plus /> Add event</button>}
             </PageHeader>
 
             <div className="cal-layout">
@@ -137,8 +139,8 @@ export default function Calendar() {
                                         </div>
                                         <div className="row-actions" style={{ alignItems: 'flex-start' }}>
                                             <button type="button" className="icon-btn sm" onClick={() => toggleDone(e)} aria-label={e.status === 'completed' ? 'Mark as not done' : 'Mark as done'}><Check /></button>
-                                            <button type="button" className="icon-btn sm" onClick={() => setModal({ event: e })} aria-label="Edit event"><Pencil /></button>
-                                            <button type="button" className="icon-btn sm danger" onClick={() => remove(e)} aria-label="Delete event"><Trash2 /></button>
+                                            {can('calendar.edit') && <button type="button" className="icon-btn sm" onClick={() => setModal({ event: e })} aria-label="Edit event"><Pencil /></button>}
+                                            {can('calendar.delete') && <button type="button" className="icon-btn sm danger" onClick={() => remove(e)} aria-label="Delete event"><Trash2 /></button>}
                                         </div>
                                     </li>
                                 ))}

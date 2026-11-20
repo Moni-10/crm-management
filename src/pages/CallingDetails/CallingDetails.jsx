@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Download, Edit2, Plus, Trash2, Upload, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { callsApi, salespersonsApi } from '../../api';
+import { useAuth } from '../../context/AuthContext';
 
 // Calling Data is built for very large sheets: every row lives in MySQL, and the page only ever asks the
 // server for one page of results (search, filters and paging run in the database, see server/routes/calls.js).
@@ -170,6 +171,7 @@ function useDebounced(value, delay = 350) {
 }
 
 export default function CallingDetails() {
+    const { can } = useAuth();
     const [result, setResult] = useState({ items: [], total: 0, cities: [] });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -409,15 +411,21 @@ export default function CallingDetails() {
             )}
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+                {can('calls.import') && (
                 <button className="btn" onClick={() => setShowImport(!showImport)} disabled={busy} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Upload size={18} /> Import Excel
                 </button>
+                )}
+                {can('calls.export') && (
                 <button className="btn" onClick={handleExportExcel} disabled={busy || result.total === 0} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Download size={18} /> Export
                 </button>
+                )}
+                {can('calls.create') && (
                 <button className="btn btn-primary" onClick={openNewCall} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Plus size={18} /> New Call
                 </button>
+                )}
             </div>
 
             {showImport && (
@@ -518,7 +526,7 @@ export default function CallingDetails() {
                                     {loading ? 'Loading calls…' : (
                                         <>
                                             No calls found.{' '}
-                                            <button type="button" className="sheet-link" onClick={openNewCall}>Add a call</button>
+                                            {can('calls.create') && <button type="button" className="sheet-link" onClick={openNewCall}>Add a call</button>}
                                         </>
                                     )}
                                 </td>
@@ -532,12 +540,16 @@ export default function CallingDetails() {
                                         </td>
                                     ))}
                                     <td className="sheet-actions">
+                                        {can('calls.edit') && (
                                         <button type="button" className="icon-btn sm" onClick={() => handleEdit(call)} title="Edit" aria-label={`Edit call with ${call.partyName}`}>
                                             <Edit2 size={16} />
                                         </button>
+                                        )}
+                                        {can('calls.delete') && (
                                         <button type="button" className="icon-btn sm danger" onClick={() => handleDelete(call)} title="Delete" aria-label={`Delete call with ${call.partyName}`}>
                                             <Trash2 size={16} />
                                         </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))

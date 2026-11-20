@@ -1,4 +1,4 @@
-import { pool } from './server/db/pool.js';
+import { pool } from '../../server/db/pool.js';
 import 'dotenv/config';
 
 const companies = [

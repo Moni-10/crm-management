@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requirePermission } from '../auth/access.js';
 import { pool } from '../db/pool.js';
 import { logActivity } from '../lib/activity.js';
 import { HttpError, fromRow, generateId, nowSql, toRow } from '../lib/mapping.js';
@@ -42,7 +43,7 @@ function buildWhere({ q, city, status, callType, date, handledBy = [] }) {
 
 // GET /api/calls/query?q=&city=&status=&callType=&page=1&pageSize=50
 // -> { items, total, page, pageSize, cities }
-router.get('/query', handler(async (req, res) => {
+router.get('/query', requirePermission('calls.view'), handler(async (req, res) => {
     const pageSize = Math.min(Math.max(parseInt(req.query.pageSize, 10) || 50, 1), MAX_PAGE_SIZE);
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
     // ?salesperson=<id>: only the calls this salesperson handled (by full name or nickname).
@@ -78,7 +79,7 @@ router.get('/query', handler(async (req, res) => {
 // The client sends large sheets in chunks; `offset` keeps reported row numbers relative to the whole sheet.
 const IMPORT_COLS = callFields.map((f) => f.col);
 
-router.post('/import', handler(async (req, res) => {
+router.post('/import', requirePermission('calls.import'), handler(async (req, res) => {
     const records = req.body?.records;
     const offset = Math.max(parseInt(req.body?.offset, 10) || 0, 0);
     if (!Array.isArray(records) || records.length === 0) throw new HttpError(400, 'No records to import');

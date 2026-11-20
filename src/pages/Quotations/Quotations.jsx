@@ -10,6 +10,7 @@ import { formatCurrency, formatDate, showToast, todayIso } from '../../utils/hel
 import QuotationForm, { EMPTY_ITEM, QUOTATION_STATUSES } from './QuotationForm';
 import QuotationPrintView from './QuotationPrintView';
 import ShareMenu from './ShareMenu';
+import { useAuth } from '../../context/AuthContext';
 
 // MMW-2026-014 style numbers: continue from the highest number used this year.
 function nextQuotationNumber(quotations) {
@@ -31,6 +32,7 @@ const blankQuotation = (quotations) => ({
 });
 
 export default function Quotations() {
+    const { can } = useAuth();
     const confirm = useConfirm();
     const [searchParams, setSearchParams] = useSearchParams();
     const { data, loading, error, reload } = useLoad(async () => {
@@ -129,6 +131,7 @@ export default function Quotations() {
             {!form && !printing && (
                 <div>
                     <PageHeader title="Quotations" subtitle={`${quotations.length} quotations`}>
+                        {can('quotations.export') && (
                         <ExportButton
                             filename="quotations"
                             count={visible.length}
@@ -141,9 +144,12 @@ export default function Quotations() {
                                 }
                             ]}
                         />
+                        )}
+                        {can('quotations.create') && (
                         <button type="button" className="btn btn-primary" onClick={() => setForm({ initial: blankQuotation(quotations), editingId: null })}>
                             <Plus /> New quotation
                         </button>
+                        )}
                     </PageHeader>
 
                     <div className="toolbar">
@@ -165,7 +171,7 @@ export default function Quotations() {
                             <EmptyState
                                 icon={FileText}
                                 title={hasFilters ? 'No quotations match' : 'No quotations yet'}
-                                action={!hasFilters && <button type="button" className="btn btn-primary" onClick={() => setForm({ initial: blankQuotation(quotations), editingId: null })}><Plus /> Create the first quotation</button>}
+                                action={can('quotations.create') && !hasFilters && <button type="button" className="btn btn-primary" onClick={() => setForm({ initial: blankQuotation(quotations), editingId: null })}><Plus /> Create the first quotation</button>}
                             >
                                 {hasFilters ? 'Try a different search or clear the filters.' : 'Create a quotation and print it on your letterhead.'}
                             </EmptyState>
@@ -200,8 +206,8 @@ export default function Quotations() {
                                                             <Printer /> Print
                                                         </button>
                                                         <ShareMenu quotation={q} onDownload={() => setPrinting({ data: q, download: true })} />
-                                                        <button type="button" className="icon-btn" onClick={() => setForm({ initial: q, editingId: q.id })} aria-label={`Edit ${q.quotationNumber}`}><Pencil /></button>
-                                                        <button type="button" className="icon-btn danger" onClick={() => remove(q)} aria-label={`Delete ${q.quotationNumber}`}><Trash2 /></button>
+                                                        {can('quotations.edit') && <button type="button" className="icon-btn" onClick={() => setForm({ initial: q, editingId: q.id })} aria-label={`Edit ${q.quotationNumber}`}><Pencil /></button>}
+                                                        {can('quotations.delete') && <button type="button" className="icon-btn danger" onClick={() => remove(q)} aria-label={`Delete ${q.quotationNumber}`}><Trash2 /></button>}
                                                     </div>
                                                 </td>
                                             </tr>

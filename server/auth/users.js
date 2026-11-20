@@ -4,8 +4,6 @@ import { pool } from '../db/pool.js';
 import { generateId, nowSql } from '../lib/mapping.js';
 import { hashPassword } from './password.js';
 
-export const publicUser = (user) => ({ id: user.id, name: user.name, email: user.email, role: user.role });
-
 // Changes whenever the password changes, so old login tokens stop working.
 export const passwordVersion = (user) =>
     crypto.createHash('sha256').update(user.password_hash).digest('hex').slice(0, 16);

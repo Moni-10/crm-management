@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
-    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound
+    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound, UserCog, ShieldCheck, Database
 } from 'lucide-react';
 import BrandMark from './BrandMark';
 import GlobalSearch from './GlobalSearch';
@@ -51,32 +51,40 @@ const NAV_GROUPS = [
         label: 'Overview',
         items: [
             { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-            { to: '/company', label: 'Company Team', icon: Users },
-            { to: '/company-profile', label: 'Company Profile', icon: ContactRound }
+            { to: '/company', perm: 'company.view', label: 'Company Team', icon: Users },
+            { to: '/company-profile', perm: 'company.view', label: 'Company Profile', icon: ContactRound }
         ]
     },
     {
         label: 'Customers',
         items: [
-            { to: '/parties', label: 'Parties', icon: Building2 },
-            { to: '/salespersons', label: 'Salespersons', icon: Users },
-            { to: '/calling-details', label: 'Calling Data', icon: Phone }
+            { to: '/parties', perm: 'parties.view', label: 'Parties', icon: Building2 },
+            { to: '/salespersons', perm: 'salespersons.view', label: 'Salespersons', icon: Users },
+            { to: '/leads', perm: 'leads.view', label: 'Leads', icon: Database },
+            { to: '/calling-details', perm: 'calls.view', label: 'Calling Data', icon: Phone }
         ]
     },
     {
         label: 'Sales',
         items: [
-            { to: '/quotations', label: 'Quotations', icon: FileText },
-            { to: '/followups', label: 'Follow-ups', icon: Clock },
-            { to: '/calendar', label: 'Calendar', icon: CalendarDays }
+            { to: '/quotations', perm: 'quotations.view', label: 'Quotations', icon: FileText },
+            { to: '/followups', perm: 'followups.view', label: 'Follow-ups', icon: Clock },
+            { to: '/calendar', perm: 'calendar.view', label: 'Calendar', icon: CalendarDays }
         ]
     },
     {
         label: 'Insights',
         items: [
-            { to: '/reports', label: 'Reports', icon: BarChart3 },
-            { to: '/backup', label: 'Backup & restore', icon: DatabaseBackup },
+            { to: '/reports', perm: 'reports.view', label: 'Reports', icon: BarChart3 },
+            { to: '/backup', perm: 'backup.view', label: 'Backup & restore', icon: DatabaseBackup },
             { to: '/settings', label: 'Settings', icon: Settings }
+        ]
+    },
+    {
+        label: 'Access',
+        items: [
+            { to: '/users', perm: 'users.manage', label: 'Users', icon: UserCog },
+            { to: '/roles', perm: 'roles.manage', label: 'Roles & permissions', icon: ShieldCheck }
         ]
     }
 ];
@@ -85,7 +93,10 @@ const isActive = (to, pathname) => (to === '/' ? pathname === '/' : pathname ===
 
 export default function Layout() {
     const { pathname } = useLocation();
-    const { user } = useAuth();
+    const { user, can } = useAuth();
+    const navGroups = NAV_GROUPS
+        .map((group) => ({ ...group, items: group.items.filter((item) => !item.perm || can(item.perm)) }))
+        .filter((group) => group.items.length > 0);
     const [menuOpen, setMenuOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [companyExpanded, setCompanyExpanded] = useState(false);
@@ -107,7 +118,7 @@ export default function Layout() {
                 </div>
 
                 <nav className="nav">
-                    {NAV_GROUPS.map((group) => (
+                    {navGroups.map((group) => (
                         <div key={group.label} className="nav-group">
                             {!sidebarCollapsed && <div className="nav-label">{group.label}</div>}
                             {group.items.map(({ to, label, icon: Icon }) => (

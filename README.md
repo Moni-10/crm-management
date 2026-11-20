@@ -5,15 +5,17 @@ React + Vite frontend, Express API, MySQL database. Everything is saved in MySQL
 ## Run
 
 1. Start MySQL (WAMP).
-2. Copy `.env.example` to `.env` and fill it in (database login, `JWT_SECRET`, first admin account).
+2. Copy `.env.example` to `.env` (or run `npm run setup`) and fill it in: database login, `JWT_SECRET`, first admin account.
 3. `npm install`
 4. `npm run dev` — starts the web app (http://localhost:5173) and the API (http://localhost:3001).
 5. Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env`, then change the password from the profile menu (top right) > Settings > Password.
 
-The database and tables are created automatically on first start, and new columns are added to existing databases automatically (`server/db/migrate.js`).
+Database changes are versioned migrations in `server/db/migrations/`. Run `npm run migrate` (also runs automatically with `npm run dev`); `npm run migrate:status` lists them. On a server: `git pull && npm ci && npm run build && npm run migrate && npm start`.
 Open `party_crm` in phpMyAdmin to browse or manage the data.
 
 Optional demo data: `npm run seed` (or Settings > Data when logged in as admin).
+
+Deploying to a server, loading the Excel leads, users/roles and backups: see [DEPLOY.md](DEPLOY.md).
 
 ## Features
 
@@ -49,7 +51,7 @@ src/
 
 ## Adding a field
 
-1. Add the column to `server/db/migrate.js` (`COLUMN_UPGRADES`) or `schema.sql` for a new table.
+1. Add a new numbered file in `server/db/migrations/` (e.g. `003_add_x.js`) and run `npm run migrate`.
 2. Add it to the field list in `server/resources/<table>.js`.
 3. Use it in the page form — no other plumbing is needed.
 

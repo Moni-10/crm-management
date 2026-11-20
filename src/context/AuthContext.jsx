@@ -57,9 +57,12 @@ export function AuthProvider({ children }) {
         setUser(me);
     }, []);
 
+    // can('parties.edit'): whether the signed-in user's role allows it. The server enforces the same rule.
+    const can = useCallback((code) => !!user?.permissions?.includes(code), [user]);
+
     const value = useMemo(
-        () => ({ user, status, login, logout, updateName, changePassword }),
-        [user, status, login, logout, updateName, changePassword]
+        () => ({ user, status, can, login, logout, updateName, changePassword }),
+        [user, status, can, login, logout, updateName, changePassword]
     );
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

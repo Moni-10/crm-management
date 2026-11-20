@@ -6,6 +6,7 @@ import { ErrorState, Loading, PageHeader } from '../../components/ui';
 import { useLoad } from '../../hooks/useLoad';
 import { formatCurrency } from '../../utils/helpers';
 import { printTableReport } from '../../utils/printHtml';
+import { useAuth } from '../../context/AuthContext';
 
 const REPORTS = [
     { id: 'salesperson', title: 'Salesperson-wise parties', blurb: 'Parties and their status for each salesperson', icon: Users },
@@ -71,6 +72,7 @@ function buildReport(id, { parties, salespersons, machines, quotations }) {
 }
 
 export default function Reports() {
+    const { can } = useAuth();
     const [active, setActive] = useState('salesperson');
     const { data, loading, error, reload } = useLoad(async () => {
         const [parties, salespersons, machines, quotations] = await Promise.all([partiesApi.list(), salespersonsApi.list(), machinesApi.list(), quotationsApi.list()]);
@@ -104,7 +106,7 @@ export default function Reports() {
                 <div className="card-head">
                     <h3><BarChart3 aria-hidden="true" /> {meta.title}</h3>
                     <div className="page-actions">
-                        <ExportButton filename={`report-${active}`} count={report.rows.length} getSheets={() => [{ name: meta.title.slice(0, 31), columns: report.columns, records: report.rows }]} />
+                        {can('reports.export') && <ExportButton filename={`report-${active}`} count={report.rows.length} getSheets={() => [{ name: meta.title.slice(0, 31), columns: report.columns, records: report.rows }]} />}
                         <button
                             type="button"
                             className="btn"

@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { requireAuth } from '../auth/middleware.js';
 import { verifyPassword } from '../auth/password.js';
 import { signToken } from '../auth/token.js';
-import { findUserByEmail, findUserById, publicUser, updatePassword } from '../auth/users.js';
+import { presentUser } from '../auth/access.js';
+import { findUserByEmail, findUserById, updatePassword } from '../auth/users.js';
 import { pool } from '../db/pool.js';
 import { HttpError, nowSql } from '../lib/mapping.js';
 
@@ -40,20 +41,24 @@ router.post('/login', async (req, res, next) => {
         checkThrottle(key);
 
         const user = await findUserByEmail(email);
-        const valid = user && await verifyPassword(String(password), user.password_hash);
+        const valid = user && user.active && await verifyPassword(String(password), user.password_hash);
         if (!valid) {
             recordFailure(key);
             throw new HttpError(401, 'Incorrect email or password');
         }
         attempts.delete(key);
-        res.json({ token: signToken(user), user: publicUser(user) });
+        res.json({ token: signToken(user), user: await presentUser(user) });
     } catch (error) {
         next(error);
     }
 });
 
-router.get('/me', requireAuth, (req, res) => {
-    res.json({ user: publicUser(req.user) });
+router.get('/me', requireAuth, async (req, res, next) => {
+    try {
+        res.json({ user: await presentUser(req.user) });
+    } catch (error) {
+        next(error);
+    }
 });
 
 router.put('/profile', requireAuth, async (req, res, next) => {
@@ -61,7 +66,7 @@ router.put('/profile', requireAuth, async (req, res, next) => {
         const name = String(req.body?.name || '').trim();
         if (!name) throw new HttpError(400, 'Name is required');
         await pool.query('UPDATE users SET name = ?, updated_at = ? WHERE id = ?', [name, nowSql(), req.user.id]);
-        res.json({ user: publicUser(await findUserById(req.user.id)) });
+        res.json({ user: await presentUser(await findUserById(req.user.id)) });
     } catch (error) {
         next(error);
     }
@@ -80,7 +85,7 @@ router.post('/change-password', requireAuth, async (req, res, next) => {
         await updatePassword(req.user.id, String(newPassword));
         const user = await findUserById(req.user.id);
         // Return a fresh token: the old one stops working once the password changes.
-        res.json({ token: signToken(user), user: publicUser(user) });
+        res.json({ token: signToken(user), user: await presentUser(user) });
     } catch (error) {
         next(error);
     }

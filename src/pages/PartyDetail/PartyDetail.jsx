@@ -1,3 +1,4 @@
+import { useAuth } from '../../context/AuthContext';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -73,6 +74,7 @@ function ShareModal({ party, onClose }) {
 }
 
 export default function PartyDetail() {
+    const { can } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
     const confirm = useConfirm();
@@ -141,8 +143,8 @@ export default function PartyDetail() {
                 {maps && <button type="button" className="btn" onClick={copyLocation}><Copy /> Copy location</button>}
                 <button type="button" className="btn" onClick={() => setSharing(true)}><Share2 /> Share</button>
                 <button type="button" className="btn" onClick={() => printHtml(buildPartyReportHtml(party, quotations))}><Printer /> Print / PDF</button>
-                <button type="button" className="btn btn-ghost" onClick={() => setEditing(true)}><Pencil /> Edit</button>
-                <button type="button" className="btn btn-ghost" onClick={remove}><Trash2 /> Delete</button>
+                {can('parties.edit') && <button type="button" className="btn btn-ghost" onClick={() => setEditing(true)}><Pencil /> Edit</button>}
+                {can('parties.delete') && <button type="button" className="btn btn-ghost" onClick={remove}><Trash2 /> Delete</button>}
             </div>
 
             <div className="detail-grid">

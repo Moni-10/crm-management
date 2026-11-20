@@ -66,3 +66,26 @@ export const backupApi = {
     export: () => http.get('/backup'),
     import: (data) => http.post('/backup/import', data)
 };
+
+// Admin: user accounts and roles/permissions.
+export const usersApi = {
+    list: () => http.get('/users'),
+    create: (data) => http.post('/users', data),
+    update: (id, data) => http.put(`/users/${encodeURIComponent(id)}`, data),
+    remove: (id) => http.delete(`/users/${encodeURIComponent(id)}`)
+};
+
+export const rolesApi = {
+    catalog: () => http.get('/roles/catalog'),
+    list: () => http.get('/roles'),
+    create: (data) => http.post('/roles', data),
+    update: (id, data) => http.put(`/roles/${id}`, data),
+    remove: (id) => http.delete(`/roles/${id}`)
+};
+
+// Leads: the imported Excel records (read-only). Search, filters and paging run on the server.
+export const leadsApi = {
+    // -> { items, total, page, pageSize, sheets }
+    query: (params) => http.get(`/leads/query?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`),
+    get: (id) => http.get(`/leads/${id}`)
+};

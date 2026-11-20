@@ -1,7 +1,11 @@
 import crypto from 'node:crypto';
 import 'dotenv/config';
 
-// Without JWT_SECRET a random one is used, which logs everyone out whenever the server restarts.
+// In production JWT_SECRET is mandatory. Elsewhere a random one is used (everyone is logged out on every restart).
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.error('JWT_SECRET is not set in .env. Refusing to start in production.');
+    process.exit(1);
+}
 const jwtSecret = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 if (!process.env.JWT_SECRET) {
     console.warn('JWT_SECRET is not set in .env - logins will not survive a server restart.');

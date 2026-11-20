@@ -9,6 +9,7 @@ import { SALESPERSON_COLUMNS } from '../../config/columns';
 import { useLoad } from '../../hooks/useLoad';
 import { logoFileToDataUrl } from '../../utils/image';
 import { showToast, whatsappUrl } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
 
 const EMPTY = { fullName: '', nickname: '', mobile: '', whatsapp: '', email: '', department: '', employeeId: '', photo: '', notes: '' };
 const SALES_DEPARTMENT_NAMES = ['Jaspal', 'Pooja', 'Aman', 'Neha Khan', 'Neha Mishra', 'Muskan', 'Rajwant', 'Renu', 'Satish', 'Swati', 'Uma'];
@@ -108,6 +109,7 @@ function SalespersonForm({ person, onClose, onSaved }) {
 }
 
 export default function Salespersons() {
+    const { can } = useAuth();
     const confirm = useConfirm();
     const { data, loading, error, reload } = useLoad(async () => {
         const [salespersons, parties] = await Promise.all([salespersonsApi.list(), partiesApi.list()]);
@@ -155,9 +157,9 @@ export default function Salespersons() {
     return (
         <div>
             <PageHeader title="Salespersons" subtitle={salespersons ? `${salespersons.length} on the team` : ''}>
-                <ExportButton filename="salespersons" count={visible.length} getSheets={() => [{ name: 'Salespersons', columns: SALESPERSON_COLUMNS, records: visible }]} />
-                <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>
-                <button type="button" className="btn btn-primary" onClick={() => setFormPerson(true)}><Plus /> Add salesperson</button>
+                {can('salespersons.export') && <ExportButton filename="salespersons" count={visible.length} getSheets={() => [{ name: 'Salespersons', columns: SALESPERSON_COLUMNS, records: visible }]} />}
+                {can('salespersons.import') && <button type="button" className="btn" onClick={() => setShowBulk(true)}><Upload /> Bulk upload</button>}
+                {can('salespersons.create') && <button type="button" className="btn btn-primary" onClick={() => setFormPerson(true)}><Plus /> Add salesperson</button>}
             </PageHeader>
 
             <section className="sales-team-roster">
@@ -179,7 +181,7 @@ export default function Salespersons() {
                     <EmptyState
                         icon={Users}
                         title={query ? 'No one matches' : 'No salespersons yet'}
-                        action={!query && <button type="button" className="btn btn-primary" onClick={() => setFormPerson(true)}><Plus /> Add a salesperson</button>}
+                        action={can('salespersons.create') && !query && <button type="button" className="btn btn-primary" onClick={() => setFormPerson(true)}><Plus /> Add a salesperson</button>}
                     >
                         {query ? 'Try a different search.' : 'Add your team so parties can be assigned to them.'}
                     </EmptyState>
@@ -207,8 +209,8 @@ export default function Salespersons() {
                                 <div className="person-foot">
                                     <Link to={`/parties?salesperson=${s.id}`} className="cell-main">{count} part{count === 1 ? 'y' : 'ies'}</Link>
                                     <div className="row-actions">
-                                        <button type="button" className="icon-btn" onClick={() => setFormPerson(s)} aria-label={`Edit ${s.fullName}`}><Pencil /></button>
-                                        <button type="button" className="icon-btn danger" onClick={() => remove(s)} aria-label={`Delete ${s.fullName}`}><Trash2 /></button>
+                                        {can('salespersons.edit') && <button type="button" className="icon-btn" onClick={() => setFormPerson(s)} aria-label={`Edit ${s.fullName}`}><Pencil /></button>}
+                                        {can('salespersons.delete') && <button type="button" className="icon-btn danger" onClick={() => remove(s)} aria-label={`Delete ${s.fullName}`}><Trash2 /></button>}
                                     </div>
                                 </div>
                             </article>
