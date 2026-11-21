@@ -76,3 +76,18 @@ export const QUOTATION_ITEM_COLUMNS = [
     { key: 'unitPrice', label: 'Unit Price', type: 'number' },
     { key: 'amount', label: 'Amount', type: 'number' }
 ];
+
+export const LEAD_COLUMNS = [
+    { key: 'companyName', label: 'Company / Lead', required: true, example: 'ABC Packaging' },
+    { key: 'contactPerson', label: 'Contact Person', example: 'Ramesh Kumar' },
+    { key: 'mobile', label: 'Mobile', example: '9876543210' },
+    { key: 'email', label: 'Email', example: 'ramesh@abc.com' },
+    { key: 'machineInterest', label: 'Machine Interest', example: 'Paper bag making machine' },
+    { key: 'city', label: 'City', example: 'Delhi' },
+    { key: 'state', label: 'State', example: 'Delhi' },
+    { key: 'source', label: 'Source', example: 'Manual' },
+    { key: 'status', label: 'Status', example: 'New' },
+    { key: 'followUpDate', label: 'Follow Up Date', example: '2026-11-25' },
+    { key: 'salesperson', exportKey: 'salespersonName', label: 'Assigned To', example: 'Pooja' },
+    { key: 'notes', label: 'Notes', example: '' }
+];

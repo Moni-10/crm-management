@@ -53,16 +53,13 @@ pm2 startup        # run the command it prints, so the app restarts after a rebo
 
 Check: `curl http://127.0.0.1:3001/api/health` shows `"status":"ok"`.
 
-## 5. Load the Excel leads (once)
+## 5. Load the Excel data (Old Excel Data)
 
-Copy the 18 `.xlsx` files from `output_small/` to the server (e.g. `scp -r output_small user@server:/home/user/`), then:
+Sign in, open **Old Excel Data** in the menu, click **Import Excel**, and choose your files (use "Download format" for the expected columns).
+Every row is stored exactly as in the file, repeats included, and files are added after the existing entries. Keep each file under about 100,000 rows (the earlier split files are ideal).
+An imported file can be removed from the same window and loaded again.
 
-```bash
-npm run import:leads -- /home/user/output_small
-```
-
-Every row is stored exactly as in Excel, repeats included (314,945 rows, about a minute). Re-running skips files already loaded.
-Check: `sudo mysql -e "SELECT COUNT(*) FROM party_crm.leads;"` shows 314945.
+Command-line alternative (same result): `npm run import:leads -- /home/user/output_small`
 
 ## 6. Apache (HTTPS reverse proxy)
 
@@ -74,7 +71,8 @@ sudo nano /etc/apache2/sites-available/crm.conf
 <VirtualHost *:80>
     ServerName crm.example.com
     ProxyPreserveHost On
-    LimitRequestBody 62914560
+    LimitRequestBody 419430400
+    ProxyTimeout 900
     RequestHeader set X-Forwarded-Proto "http"
     ProxyPass / http://127.0.0.1:3001/
     ProxyPassReverse / http://127.0.0.1:3001/

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
-    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound, UserCog, ShieldCheck, Database
+    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound, UserCog, ShieldCheck, Database, Target
 } from 'lucide-react';
 import BrandMark from './BrandMark';
 import GlobalSearch from './GlobalSearch';
@@ -60,7 +60,8 @@ const NAV_GROUPS = [
         items: [
             { to: '/parties', perm: 'parties.view', label: 'Parties', icon: Building2 },
             { to: '/salespersons', perm: 'salespersons.view', label: 'Salespersons', icon: Users },
-            { to: '/leads', perm: 'leads.view', label: 'Leads', icon: Database },
+            { to: '/leads', perm: 'leads.view', label: 'Leads', icon: Target },
+            { to: '/old-excel-data', perm: 'oldexcel.view', label: 'Old Excel Data', icon: Database },
             { to: '/calling-details', perm: 'calls.view', label: 'Calling Data', icon: Phone }
         ]
     },

@@ -83,9 +83,15 @@ export const rolesApi = {
     remove: (id) => http.delete(`/roles/${id}`)
 };
 
-// Leads: the imported Excel records (read-only). Search, filters and paging run on the server.
-export const leadsApi = {
+// Old Excel Data: the imported Excel records (follow-ups). Search, filters and paging run on the server.
+export const oldExcelApi = {
     // -> { items, total, page, pageSize, sheets }
-    query: (params) => http.get(`/leads/query?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`),
-    get: (id) => http.get(`/leads/${id}`)
+    query: (params) => http.get(`/old-excel/query?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`),
+    get: (id) => http.get(`/old-excel/${id}`),
+    batches: () => http.get('/old-excel/batches'),
+    removeBatch: (id) => http.delete(`/old-excel/batches/${id}`),
+    print: (params) => http.get(`/old-excel/print?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`)
 };
+
+// Leads added by hand (separate from the Excel data).
+export const leadsApi = createResourceApi('leads');

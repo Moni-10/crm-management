@@ -15,7 +15,7 @@ import authRoutes from './routes/auth.js';
 import callsRoutes from './routes/calls.js';
 import backupRoutes from './routes/backup.js';
 import { ensureCompanyRow, readCompany, updateCompany } from './routes/company.js';
-import leadsRoutes from './routes/leads.js';
+import oldExcelRoutes from './routes/old-excel.js';
 import crudRoutes from './routes/crud.js';
 import rolesRoutes from './routes/roles.js';
 import searchRoutes from './routes/search.js';
@@ -53,7 +53,7 @@ app.use('/api/admin', requireAdmin, adminRoutes);
 app.use('/api/users', requirePermission('users.manage'), usersRoutes);
 app.use('/api/roles', requirePermission('roles.manage'), rolesRoutes);
 app.use('/api/calls', callsRoutes); // paged search + fast Excel import; must come before the generic /calls/:id routes
-app.use('/api/leads', leadsRoutes);
+app.use('/api/old-excel', oldExcelRoutes);
 app.use('/api', crudRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
