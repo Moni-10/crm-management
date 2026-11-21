@@ -436,3 +436,18 @@ table { border-collapse: collapse; width: 100%; }
 .client-share-quote .menu-item { gap: 5px; }
 .client-share-menu .menu-item svg { flex-shrink: 0; }
 .client-share-menu { min-width: 300px; }
+
+/* ---------- Pager (long lists: jump to page / record number) ---------- */
+.pager { display: flex; flex-direction: column; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--border); font-size: 13.5px; color: var(--text-2); }
+.pager-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.pager-nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.pager-nav .btn { min-height: 34px; min-width: 34px; padding: 4px 10px; }
+.pager-gap { padding: 0 4px; color: var(--text-3); }
+.pager-jump { display: flex; align-items: center; gap: 8px; }
+.pager-jump .input { width: 110px; min-height: 34px; padding-top: 4px; padding-bottom: 4px; }
+.pager-jump .btn { min-height: 34px; padding: 4px 12px; }
+.pager-size { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.pager-size .input { width: auto; min-height: 34px; padding-top: 4px; padding-bottom: 4px; }
+.pager-error { color: var(--danger); font-size: 13px; }
+tr.row-found td { background: color-mix(in srgb, var(--primary) 14%, transparent); animation: row-found-fade 4s ease-out forwards; }
+@keyframes row-found-fade { 0%, 60% { background: color-mix(in srgb, var(--primary) 14%, transparent); } 100% { background: transparent; } }

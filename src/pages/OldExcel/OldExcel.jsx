@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Database, Download, FileSpreadsheet, Printer, RotateCcw, Search, Trash2, Upload } from 'lucide-react';
+import { Database, Download, FileSpreadsheet, Printer, RotateCcw, Search, Trash2, Upload } from 'lucide-react';
 import { oldExcelApi } from '../../api';
 import { tokenStore } from '../../api/client';
-import { Badge, ErrorState, Modal, PageHeader, useConfirm } from '../../components/ui';
+import { useSearchParams } from 'react-router-dom';
+import { Badge, ErrorState, Modal, PageHeader, Pager, useConfirm } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
 import { showToast } from '../../utils/helpers';
 
-const PAGE_SIZES = [50, 100, 200];
 const EMPTY_FILTERS = { sheet: '', machine: '', location: '', coming: '', email: '', phone: '', dateFrom: '', dateTo: '', hasDate: '', repeated: '', sort: 'newest' };
 const fmt = (n) => Number(n).toLocaleString('en-IN');
 const dash = (v) => (v == null || String(v).trim() === '' ? '—' : v);
@@ -159,7 +159,7 @@ function EntryDetail({ id, onClose }) {
             {!lead && !error && <p className="hint">Loading...</p>}
             {lead && (
                 <>
-                    {row('Source', `${lead.file || lead.sheet} · ${lead.sheet} · entry no. ${fmt(lead.row)}`)}
+                    {row('Source', `${lead.file || lead.sheet} · ${lead.sheet} · entry no. ${fmt(lead.id)}`)}
                     {row('Sno', lead.sno)}
                     {row('Date / tag', lead.dateText)}
                     {row('Machine', lead.machine)}
@@ -181,11 +181,11 @@ function EntryDetail({ id, onClose }) {
                             <h3 style={{ marginBottom: 8 }}>Other entries with the same number ({lead.sameNumber.length})</h3>
                             <div className="table-wrap">
                                 <table className="table">
-                                    <thead><tr><th>Sno</th><th>Entry</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th></tr></thead>
+                                    <thead><tr><th>Entry no.</th><th>Sno</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th></tr></thead>
                                     <tbody>
                                         {lead.sameNumber.map((o) => (
                                             <tr key={o.id}>
-                                                <td>{dash(o.sno)}</td><td>{fmt(o.row)}</td><td>{dash(o.dateText)}</td><td>{dash(o.machine)}</td><td>{dash(o.location)}</td><td>{dash(o.coming)}</td>
+                                                <td>{fmt(o.id)}</td><td>{dash(o.sno)}</td><td>{dash(o.dateText)}</td><td>{dash(o.machine)}</td><td>{dash(o.location)}</td><td>{dash(o.coming)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -201,8 +201,10 @@ function EntryDetail({ id, onClose }) {
 
 export default function OldExcel() {
     const { can } = useAuth();
-    const [q, setQ] = useState('');
-    const [debouncedQ, setDebouncedQ] = useState('');
+    const [searchParams] = useSearchParams();
+    const [q, setQ] = useState(searchParams.get('q') || '');
+    const [debouncedQ, setDebouncedQ] = useState(searchParams.get('q') || '');
+    const [highlightNo, setHighlightNo] = useState(null);
     const [filters, setFilters] = useState(EMPTY_FILTERS);
     const [debounced, setDebounced] = useState(EMPTY_FILTERS);
     const [page, setPage] = useState(1);
@@ -218,7 +220,7 @@ export default function OldExcel() {
 
     // Typing waits a moment before asking the server, and any change goes back to page 1.
     useEffect(() => {
-        const t = setTimeout(() => { setDebouncedQ(q); setDebounced(filters); setPage(1); }, 350);
+        const t = setTimeout(() => { setDebouncedQ(q); setDebounced(filters); setPage(1); setHighlightNo(null); }, 350);
         return () => clearTimeout(t);
     }, [q, filters]);
 
@@ -236,9 +238,21 @@ export default function OldExcel() {
     const set = (key) => (e) => setFilters((f) => ({ ...f, [key]: e.target.value }));
     const hasFilters = q || JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS);
     const reset = () => { setQ(''); setFilters(EMPTY_FILTERS); };
-    const pageCount = Math.max(1, Math.ceil(result.total / pageSize));
-    const firstRow = (page - 1) * pageSize;
     const current = () => ({ q: debouncedQ, ...debounced });
+
+    // "Go to entry no. N": ask the server which page holds it, open that page and highlight the row.
+    const jumpToNumber = async (n) => {
+        if (debounced.sort === 'date') return 'Set the order to Newest first or Oldest first to jump to an entry number.';
+        const r = await oldExcelApi.locate({ number: n, ...current(), pageSize });
+        if (!r.found) return false;
+        setPage(r.page);
+        setHighlightNo(n);
+        return true;
+    };
+    useEffect(() => {
+        if (highlightNo == null || loading) return;
+        document.querySelector(`tr[data-no="${highlightNo}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, [highlightNo, loading, result]);
 
     const exportFile = async (format) => {
         setExporting(format);
@@ -259,14 +273,14 @@ export default function OldExcel() {
         try {
             const data = await oldExcelApi.print(current());
             const summary = [debouncedQ && `Search: ${debouncedQ}`, ...Object.entries(debounced).filter(([k, v]) => v && k !== 'sort').map(([k, v]) => `${k}: ${v}`)].filter(Boolean).join(' · ');
-            const rows = data.items.map((l) => `<tr><td>${esc(l.sno)}</td><td>${esc(l.row)}</td><td>${esc(l.dateText)}</td><td>${esc(l.machine)}</td><td>${esc(l.location)}</td><td>${esc(l.coming)}</td><td>${esc(l.contact)}</td><td>${esc(l.email)}</td></tr>`).join('');
+            const rows = data.items.map((l) => `<tr><td>${esc(l.id)}</td><td>${esc(l.sno)}</td><td>${esc(l.dateText)}</td><td>${esc(l.machine)}</td><td>${esc(l.location)}</td><td>${esc(l.coming)}</td><td>${esc(l.contact)}</td><td>${esc(l.email)}</td></tr>`).join('');
             w.document.open();
             w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Old Excel Data</title>
 <style>body{font-family:Arial,sans-serif;font-size:11px;margin:16px}h1{font-size:16px;margin:0 0 4px}p{margin:0 0 10px;color:#444}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:3px 5px;text-align:left;vertical-align:top;word-break:break-word}
 th{background:#eee}tr{page-break-inside:avoid}thead{display:table-header-group}</style></head><body>
 <h1>Old Excel Data</h1><p>${esc(new Date().toLocaleString('en-IN'))} · ${fmt(data.items.length)} of ${fmt(data.total)} entries${data.total > data.limit ? ` (first ${fmt(data.limit)}; narrow the filters or use Export for the rest)` : ''}${summary ? ` · ${esc(summary)}` : ''}</p>
-<table><thead><tr><th>Sno</th><th>Entry</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th><th>Contact</th><th>Email</th></tr></thead><tbody>${rows}</tbody></table>
+<table><thead><tr><th>Entry no.</th><th>Sno</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th><th>Contact</th><th>Email</th></tr></thead><tbody>${rows}</tbody></table>
 <script>window.onload=function(){window.print()}</script></body></html>`);
             w.document.close();
         } catch (e) {
@@ -324,7 +338,7 @@ th{background:#eee}tr{page-break-inside:avoid}thead{display:table-header-group}<
                     <div className="table-wrap">
                         <table className="table">
                             <thead>
-                                <tr><th>Sno</th><th>Entry</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th><th>Contact</th><th>Email</th></tr>
+                                <tr><th>Entry no.</th><th>Sno</th><th>Date / tag</th><th>Machine</th><th>Location</th><th>Coming</th><th>Contact</th><th>Email</th></tr>
                             </thead>
                             <tbody>
                                 {result.items.length === 0 ? (
@@ -332,9 +346,9 @@ th{background:#eee}tr{page-break-inside:avoid}thead{display:table-header-group}<
                                         {loading ? 'Loading...' : <><Database size={18} style={{ verticalAlign: 'middle' }} /> {hasFilters ? 'No entries match.' : 'No Excel data yet. Use Import Excel to add your files.'}</>}
                                     </td></tr>
                                 ) : result.items.map((l) => (
-                                    <tr key={l.id} onClick={() => setOpenId(l.id)} style={{ cursor: 'pointer' }}>
-                                        <td><b>{dash(l.sno)}</b></td>
-                                        <td className="hint">{fmt(l.row)}</td>
+                                    <tr key={l.id} data-no={l.id} onClick={() => setOpenId(l.id)} style={{ cursor: 'pointer' }} className={l.id === highlightNo ? 'row-found' : undefined}>
+                                        <td className="hint"><b>{fmt(l.id)}</b></td>
+                                        <td>{dash(l.sno)}</td>
                                         <td>{dash(l.dateText)}</td>
                                         <td>{dash(l.machine)}</td>
                                         <td>{dash(l.location)}</td>
@@ -350,21 +364,12 @@ th{background:#eee}tr{page-break-inside:avoid}thead{display:table-header-group}<
                             </tbody>
                         </table>
                     </div>
-                    {result.total > 0 && (
-                        <div className="sheet-pager">
-                            <span>Showing <b>{fmt(firstRow + 1)}–{fmt(Math.min(firstRow + pageSize, result.total))}</b> of <b>{fmt(result.total)}</b></span>
-                            <label className="sheet-pager-size">Rows per page
-                                <select className="input" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}>
-                                    {PAGE_SIZES.map((n) => <option key={n} value={n}>{n}</option>)}
-                                </select>
-                            </label>
-                            <div className="sheet-pager-nav">
-                                <button type="button" className="btn" onClick={() => setPage(page - 1)} disabled={page <= 1 || loading} aria-label="Previous page"><ChevronLeft size={16} /></button>
-                                <span>Page {fmt(page)} of {fmt(pageCount)}</span>
-                                <button type="button" className="btn" onClick={() => setPage(page + 1)} disabled={page >= pageCount || loading} aria-label="Next page"><ChevronRight size={16} /></button>
-                            </div>
-                        </div>
-                    )}
+                    <Pager
+                        page={page} pageSize={pageSize} total={result.total} loading={loading}
+                        onPage={(n) => { setPage(n); setHighlightNo(null); }}
+                        onPageSize={(n) => { setPageSize(n); setPage(1); setHighlightNo(null); }}
+                        pageSizes={[50, 100, 200]} numberLabel="entry no." onJumpNumber={jumpToNumber}
+                    />
                 </div>
             )}
             {openId && <EntryDetail id={openId} onClose={() => setOpenId(null)} />}

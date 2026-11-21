@@ -11,6 +11,7 @@ export const MODULES = [
     { key: 'quotations', label: 'Quotations', actions: ['view', 'create', 'edit', 'delete', 'import', 'export'] },
     { key: 'calendar', label: 'Calendar & events', actions: ['view', 'create', 'edit', 'delete'] },
     { key: 'leads', label: 'Leads', actions: ['view', 'create', 'edit', 'delete', 'export'] },
+    { key: 'followuplog', label: 'Follow-up Log', actions: ['view', 'create', 'edit', 'delete', 'export'] },
     { key: 'oldexcel', label: 'Old Excel Data', actions: ['view', 'export', 'import', 'delete'] },
     { key: 'calls', label: 'Calling Data', actions: ['view', 'create', 'edit', 'delete', 'import', 'export'] },
     { key: 'followups', label: 'Follow-ups', actions: ['view'] },

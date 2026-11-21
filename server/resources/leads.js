@@ -23,7 +23,17 @@ export const leads = createCrud({
     fields: leadFields,
     selectSql: `SELECT t.*, s.full_name AS salesperson_name
                 FROM crm_leads t LEFT JOIN salespersons s ON s.id = t.assigned_salesperson`,
-    mapRow: (row) => ({ salespersonName: row.salesperson_name || '' }),
-    orderBy: 't.created_at DESC',
+    mapRow: (row) => ({ salespersonName: row.salesperson_name || '', leadNo: row.lead_no }), // leadNo is read-only
+    orderBy: 't.lead_no DESC',
+    numberCol: 't.lead_no',
+    filterCols: { status: 't.status', source: 't.source', assigned: 't.assigned_salesperson', city: 't.city', state: 't.state' },
+    sorts: {
+        newest: 't.lead_no DESC',
+        oldest: 't.lead_no ASC',
+        followup: 't.follow_up_date IS NULL, t.follow_up_date ASC, t.lead_no DESC',
+        name: 't.company_name ASC'
+    },
+    searchColumn: 't.search_text',
+    phoneCols: ['t.mobile'],
     searchCols: ['t.company_name', 't.contact_person', 't.mobile', 't.email', 't.machine_interest', 't.city', 't.state', 't.notes']
 });

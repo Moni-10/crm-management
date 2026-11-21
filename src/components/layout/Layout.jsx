@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
-    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound, UserCog, ShieldCheck, Database, Target
+    BarChart3, Bell, Building2, CalendarDays, Clock, DatabaseBackup, FileText, LayoutDashboard, Mail, MapPin, Menu, Phone, Users, X, ChevronLeft, Settings, ContactRound, UserCog, ShieldCheck, Database, Target, ClipboardList
 } from 'lucide-react';
 import BrandMark from './BrandMark';
 import GlobalSearch from './GlobalSearch';
@@ -69,6 +69,7 @@ const NAV_GROUPS = [
         label: 'Sales',
         items: [
             { to: '/quotations', perm: 'quotations.view', label: 'Quotations', icon: FileText },
+            { to: '/followup-log', perm: 'followuplog.view', label: 'Follow-up Log', icon: ClipboardList },
             { to: '/followups', perm: 'followups.view', label: 'Follow-ups', icon: Clock },
             { to: '/calendar', perm: 'calendar.view', label: 'Calendar', icon: CalendarDays }
         ]

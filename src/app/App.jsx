@@ -13,6 +13,7 @@ import CompanyTeam from '../pages/Company/CompanyTeam';
 import CompanyProfile from '../pages/Company/CompanyProfile';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import FollowUps from '../pages/FollowUps/FollowUps';
+import FollowupLog from '../pages/FollowupLog/FollowupLog';
 import Leads from '../pages/Leads/Leads';
 import OldExcel from '../pages/OldExcel/OldExcel';
 import Login from '../pages/Login/Login';
@@ -89,6 +90,7 @@ function AppRoutes() {
                         <Route path="machines" element={<Guard perm="machines.view"><Machines /></Guard>} />
                         <Route path="calling-details" element={<Guard perm="calls.view"><CallingDetails /></Guard>} />
                         <Route path="leads" element={<Guard perm="leads.view"><Leads /></Guard>} />
+                        <Route path="followup-log" element={<Guard perm="followuplog.view"><FollowupLog /></Guard>} />
                         <Route path="old-excel-data" element={<Guard perm="oldexcel.view"><OldExcel /></Guard>} />
                         <Route path="calendar" element={<Guard perm="calendar.view"><Calendar /></Guard>} />
                         <Route path="followups" element={<Guard perm="followups.view"><FollowUps /></Guard>} />

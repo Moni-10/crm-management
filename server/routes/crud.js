@@ -14,6 +14,20 @@ for (const [name, resource] of Object.entries(resources)) {
         res.json(await resource.list());
     }));
 
+    if (resource.query) {
+        router.get(`/${name}/query`, need('view'), handler(async (req, res) => {
+            const { q, sort, page, pageSize, ...filters } = req.query;
+            res.json(await resource.query({ q, sort, page, pageSize, filters }));
+        }));
+    }
+
+    if (resource.locate) {
+        router.get(`/${name}/locate`, need('view'), handler(async (req, res) => {
+            const { number, q, sort, pageSize, page: _page, ...filters } = req.query;
+            res.json(await resource.locate({ number, q, sort, pageSize, filters }));
+        }));
+    }
+
     router.post(`/${name}/bulk`, need('import'), handler(async (req, res) => {
         const records = req.body?.records;
         if (!Array.isArray(records) || records.length === 0) {

@@ -15,7 +15,7 @@ export default function ExportButton({ filename, getSheets, count }) {
     const handleClick = async () => {
         setBusy(true);
         try {
-            await exportToExcel(filename, getSheets());
+            await exportToExcel(filename, await getSheets()); // getSheets may be async (e.g. fetch every page)
             showToast(`Exported ${count} row(s) to Excel`);
         } catch (error) {
             console.error('Export failed:', error);

@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Pencil, Plus, Search, Target, Trash2 } from 'lucide-react';
 import { leadsApi, salespersonsApi } from '../../api';
 import ExportButton from '../../components/bulk/ExportButton';
-import { Badge, EmptyState, ErrorState, Field, Loading, Modal, PageHeader, useConfirm } from '../../components/ui';
+import { Badge, EmptyState, ErrorState, Field, Loading, Modal, PageHeader, Pager, useConfirm } from '../../components/ui';
 import { LEAD_COLUMNS } from '../../config/columns';
 import { useAuth } from '../../context/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
@@ -74,26 +75,71 @@ function LeadForm({ lead, salespersons, onClose, onSaved }) {
     );
 }
 
+const fmt = (n) => Number(n).toLocaleString('en-IN');
+const FILTERS = { status: '', sort: 'newest' };
+
 export default function Leads() {
     const { can } = useAuth();
     const confirm = useConfirm();
-    const { data, loading, error, reload } = useLoad(async () => {
-        const [leads, salespersons] = await Promise.all([leadsApi.list(), salespersonsApi.list()]);
-        return { leads, salespersons };
-    });
-    const [query, setQuery] = useState('');
-    const [status, setStatus] = useState('');
+    const people = useLoad(() => salespersonsApi.list());
+    const [searchParams] = useSearchParams();
+    const [q, setQ] = useState(searchParams.get('q') || '');
+    const [filters, setFilters] = useState(FILTERS);
+    const [applied, setApplied] = useState({ q: searchParams.get('q') || '', ...FILTERS });
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(50);
+    const [result, setResult] = useState({ items: [], total: 0 });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [reloadKey, setReloadKey] = useState(0);
     const [form, setForm] = useState(null);
+    const [highlightNo, setHighlightNo] = useState(null);
+    const requestId = useRef(0);
 
-    const leads = data?.leads;
-    const visible = useMemo(() => {
-        const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-        return (leads || []).filter((l) => {
-            if (status && l.status !== status) return false;
-            const haystack = [l.companyName, l.contactPerson, l.mobile, l.email, l.machineInterest, l.city, l.state, l.source, l.salespersonName, l.notes].join(' ').toLowerCase();
-            return words.every((w) => haystack.includes(w));
-        });
-    }, [leads, query, status]);
+    // Search/filters go to the server (never the whole table to the browser); typing waits a moment first.
+    useEffect(() => {
+        const t = setTimeout(() => { setApplied({ q, ...filters }); setPage(1); setHighlightNo(null); }, 350);
+        return () => clearTimeout(t);
+    }, [q, filters]);
+
+    const paramsKey = JSON.stringify({ ...applied, page, pageSize, reloadKey });
+    useEffect(() => {
+        const id = ++requestId.current;
+        setLoading(true);
+        const { reloadKey: _r, ...params } = JSON.parse(paramsKey);
+        leadsApi.query(params)
+            .then((data) => { if (id === requestId.current) { setResult(data); setError(''); } })
+            .catch((e) => { if (id === requestId.current) setError(e.message); })
+            .finally(() => { if (id === requestId.current) setLoading(false); });
+    }, [paramsKey]);
+
+    const reload = () => setReloadKey((n) => n + 1);
+
+    // "Go to lead no. N": ask the server which page holds it, open that page and highlight the row.
+    const jumpToNumber = async (n) => {
+        if (applied.sort !== 'newest' && applied.sort !== 'oldest') return 'Set the order to Newest first or Oldest first to jump to a lead number.';
+        const r = await leadsApi.locate({ number: n, q: applied.q, status: applied.status, sort: applied.sort, pageSize });
+        if (!r.found) return false;
+        setPage(r.page);
+        setHighlightNo(n);
+        return true;
+    };
+    useEffect(() => {
+        if (highlightNo == null || loading) return;
+        document.querySelector(`tr[data-no="${highlightNo}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, [highlightNo, loading, result]);
+    const hasFilters = Boolean(q || filters.status);
+
+    // Export fetches every matching lead from the server in pages of 1000 (up to 50,000).
+    const exportRecords = async () => {
+        const records = [];
+        for (let p = 1; p <= 50; p += 1) {
+            const data = await leadsApi.query({ ...applied, page: p, pageSize: 1000 });
+            records.push(...data.items);
+            if (records.length >= data.total) break;
+        }
+        return [{ name: 'Leads', columns: LEAD_COLUMNS, records }];
+    };
 
     const remove = async (lead) => {
         const ok = await confirm({ title: `Delete ${lead.companyName}?`, message: 'This lead is removed. Imported Excel data is not affected.', confirmLabel: 'Delete lead', danger: true });
@@ -101,46 +147,53 @@ export default function Leads() {
         try {
             await leadsApi.remove(lead.id);
             showToast('Lead deleted');
-            reload({ silent: true });
+            reload();
         } catch (err) {
             showToast(err.message, 'error');
         }
     };
 
     if (error) return <ErrorState message={error} onRetry={reload} />;
-    if (loading && !data) return <Loading label="Loading leads..." />;
+    if (people.loading && !people.data) return <Loading label="Loading leads..." />;
 
     return (
         <div>
-            <PageHeader title="Leads" subtitle={`${leads.length} lead${leads.length === 1 ? '' : 's'} added in the CRM`}>
-                {can('leads.export') && <ExportButton filename="leads" count={visible.length} getSheets={() => [{ name: 'Leads', columns: LEAD_COLUMNS, records: visible }]} />}
+            <PageHeader title="Leads" subtitle={`${fmt(result.total)} lead${result.total === 1 ? '' : 's'}${hasFilters ? ' match' : ' added in the CRM'}`}>
+                {can('leads.export') && <ExportButton filename="leads" count={result.total} getSheets={exportRecords} />}
                 {can('leads.create') && <button type="button" className="btn btn-primary" onClick={() => setForm({})}><Plus /> Add lead</button>}
             </PageHeader>
 
             <div className="toolbar">
                 <div className="search-field grow">
                     <Search aria-hidden="true" />
-                    <input className="input" type="search" placeholder="Search leads..." value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search leads" />
+                    <input className="input" type="search" placeholder="Search name, phone, email, machine, city, notes..." value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search leads" />
                 </div>
-                <select className="select" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status" style={{ width: 'auto' }}>
+                <select className="select" value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))} aria-label="Status" style={{ width: 'auto' }}>
                     <option value="">All statuses</option>
                     {STATUSES.map((s) => <option key={s}>{s}</option>)}
                 </select>
+                <select className="select" value={filters.sort} onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))} aria-label="Sort" style={{ width: 'auto' }}>
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="followup">Next follow-up</option>
+                    <option value="name">Name A-Z</option>
+                </select>
             </div>
 
-            <div className="card">
-                {visible.length === 0 ? (
-                    <EmptyState icon={Target} title={leads.length === 0 ? 'No leads yet' : 'No leads match'}
-                        action={leads.length === 0 && can('leads.create') && <button type="button" className="btn btn-primary" onClick={() => setForm({})}><Plus /> Add your first lead</button>}>
-                        {leads.length === 0 ? 'Add a lead to start tracking it. The imported Excel records are under Old Excel Data.' : 'Try a different search or status.'}
+            <div className="card" style={{ opacity: loading ? 0.6 : 1, transition: 'opacity .15s' }}>
+                {result.items.length === 0 && !loading ? (
+                    <EmptyState icon={Target} title={hasFilters ? 'No leads match' : 'No leads yet'}
+                        action={!hasFilters && can('leads.create') && <button type="button" className="btn btn-primary" onClick={() => setForm({})}><Plus /> Add your first lead</button>}>
+                        {hasFilters ? 'Try a different search or status.' : 'Add a lead to start tracking it. The imported Excel records are under Old Excel Data.'}
                     </EmptyState>
                 ) : (
                     <div className="table-wrap">
                         <table className="table">
-                            <thead><tr><th>Lead</th><th>Contact</th><th>Machine</th><th>Location</th><th>Status</th><th>Follow-up</th><th>Assigned</th><th className="actions" /></tr></thead>
+                            <thead><tr><th>No.</th><th>Lead</th><th>Contact</th><th>Machine</th><th>Location</th><th>Status</th><th>Follow-up</th><th>Assigned</th><th className="actions" /></tr></thead>
                             <tbody>
-                                {visible.map((l) => (
-                                    <tr key={l.id}>
+                                {result.items.map((l) => (
+                                    <tr key={l.id} data-no={l.leadNo} className={l.leadNo === highlightNo ? 'row-found' : undefined}>
+                                        <td className="hint">{fmt(l.leadNo)}</td>
                                         <td><b>{l.companyName}</b>{l.source && l.source !== 'Manual' && <div className="hint">{l.source}</div>}</td>
                                         <td>{l.contactPerson || '—'}{l.mobile && <div><a href={`tel:${l.mobile}`}>{l.mobile}</a></div>}{l.email && <div className="hint">{l.email}</div>}</td>
                                         <td>{l.machineInterest || '—'}</td>
@@ -158,8 +211,15 @@ export default function Leads() {
                         </table>
                     </div>
                 )}
+                <Pager
+                    page={page} pageSize={pageSize} total={result.total} loading={loading}
+                    onPage={(n) => { setPage(n); setHighlightNo(null); }}
+                    onPageSize={(n) => { setPageSize(n); setPage(1); setHighlightNo(null); }}
+                    numberLabel="lead no." onJumpNumber={jumpToNumber}
+                />
             </div>
-            {form && <LeadForm lead={form.id ? form : null} salespersons={data.salespersons} onClose={() => setForm(null)} onSaved={() => { setForm(null); reload({ silent: true }); }} />}
+            {form && <LeadForm lead={form.id ? form : null} salespersons={people.data || []} onClose={() => setForm(null)} onSaved={() => { setForm(null); reload(); }} />}
         </div>
     );
 }
+

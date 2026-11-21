@@ -2,6 +2,7 @@ import { Loader } from 'lucide-react';
 import { avatarTone, getInitials, statusTone } from '../../utils/helpers';
 
 export { default as Modal } from './Modal';
+export { default as Pager } from './Pager';
 export { default as SearchSelect } from './SearchSelect';
 export { default as Toaster } from './Toaster';
 export { ConfirmProvider, useConfirm } from './ConfirmProvider';

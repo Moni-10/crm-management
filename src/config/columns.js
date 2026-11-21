@@ -91,3 +91,18 @@ export const LEAD_COLUMNS = [
     { key: 'salesperson', exportKey: 'salespersonName', label: 'Assigned To', example: 'Pooja' },
     { key: 'notes', label: 'Notes', example: '' }
 ];
+
+export const FOLLOWUP_COLUMNS = [
+    { key: 'followUpNo', label: 'No.', example: '' },
+    { key: 'partyName', label: 'Party / Company', required: true, example: 'ABC Packaging' },
+    { key: 'contactPerson', label: 'Contact Person', example: 'Ramesh Kumar' },
+    { key: 'mobile', label: 'Mobile', example: '9876543210' },
+    { key: 'email', label: 'Email', example: '' },
+    { key: 'machine', label: 'Machine', example: 'Paper bag making machine' },
+    { key: 'location', label: 'Location', example: 'Delhi' },
+    { key: 'followUpDate', label: 'Follow-up Date', example: '2026-11-21' },
+    { key: 'nextFollowUpDate', label: 'Next Follow-up', example: '2026-11-28' },
+    { key: 'takenBy', label: 'Taken By', example: 'Pooja' },
+    { key: 'outcome', label: 'Outcome', example: 'Follow-up' },
+    { key: 'notes', label: 'Notes', example: '' }
+];

@@ -92,7 +92,7 @@ router.get('/query', requirePermission('oldexcel.view'), handler(async (req, res
 
 // GET /api/leads/export?<same filters>&format=xlsx|csv&sort= -> every matching entry, in the chosen order
 const EXPORT_HEAD = ['Sno', 'Entry no.', 'Sheet', 'Date / tag', 'Machine', 'Location', 'Coming', 'Contact', 'Email'];
-const exportRow = (r) => [r.sno, r.source_row, r.source_sheet, r.date_text, r.machine, r.location, r.coming, r.contact, r.email];
+const exportRow = (r) => [r.sno, r.id, r.source_sheet, r.date_text, r.machine, r.location, r.coming, r.contact, r.email];
 const MAX_XLSX_ROWS = 250000;
 
 router.get('/export', requirePermission('oldexcel.export'), handler(async (req, res) => {
@@ -196,6 +196,21 @@ router.delete('/batches/:id', requirePermission('oldexcel.delete'), handler(asyn
     res.json({ success: true });
 }));
 
+// GET /api/old-excel/locate?number=<entry no.>&<same filters>&sort=newest|source&pageSize= -> { found, page, position }
+router.get('/locate', requirePermission('oldexcel.view'), handler(async (req, res) => {
+    const n = Number(req.query.number);
+    if (!Number.isInteger(n) || n < 1) return res.json({ found: false });
+    if (req.query.sort === 'date') throw new HttpError(400, 'Set the order to Newest first or Oldest first to jump to an entry number.');
+    const size = Math.min(Math.max(parseInt(req.query.pageSize, 10) || 50, 1), MAX_PAGE_SIZE);
+    const { sql, params } = buildWhere(req.query);
+    const glue = sql ? `${sql} AND` : 'WHERE';
+    const [hit] = await pool.query(`SELECT 1 AS x FROM leads l ${glue} l.id = ? LIMIT 1`, [...params, n]);
+    if (hit.length === 0) return res.json({ found: false });
+    const oldestFirst = req.query.sort === 'source';
+    const [[{ ahead }]] = await pool.query(`SELECT COUNT(*) AS ahead FROM leads l ${glue} l.id ${oldestFirst ? '<' : '>'} ?`, [...params, n]);
+    return res.json({ found: true, page: Math.floor(Number(ahead) / size) + 1, position: Number(ahead) + 1 });
+}));
+
 // GET /api/leads/:id -> the entry, its phones, and the other entries that share one of its numbers
 router.get('/:id', requirePermission('oldexcel.view'), handler(async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) throw new HttpError(404, 'Entry not found');
@@ -213,5 +228,12 @@ router.get('/:id', requirePermission('oldexcel.view'), handler(async (req, res) 
     );
     res.json({ ...lead, sameNumber: others.map(toApi) });
 }));
+
+// Used by the global search box: the newest matching entries (the caller asks for one extra to know if there are more).
+export async function searchEntries(term, limit) {
+    const { sql, params } = buildWhere({ q: term });
+    const [rows] = await pool.query(`SELECT l.* FROM leads l ${sql} ORDER BY l.id DESC LIMIT ?`, [...params, limit]);
+    return rows.map(toApi);
+}
 
 export default router;

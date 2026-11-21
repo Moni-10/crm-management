@@ -7,6 +7,10 @@ const createResourceApi = (name) => ({
     create: (data) => http.post(`/${name}`, data),
     update: (data) => http.put(`/${name}/${encodeURIComponent(data.id)}`, data),
     remove: (id) => http.delete(`/${name}/${encodeURIComponent(id)}`),
+    // Server-side search/filter/paging -> { items, total, page, pageSize }. Not every resource supports it yet (leads does).
+    query: (params) => http.get(`/${name}/query?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v != null))}`),
+    // Which page is record no. N on? -> { found, page, position } (only for lists that have running numbers)
+    locate: (params) => http.get(`/${name}/locate?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v != null))}`),
     // -> { created, failed, errors: [{ row, message }] }
     bulkCreate: (records) => http.post(`/${name}/bulk`, { records })
 });
@@ -88,6 +92,8 @@ export const oldExcelApi = {
     // -> { items, total, page, pageSize, sheets }
     query: (params) => http.get(`/old-excel/query?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`),
     get: (id) => http.get(`/old-excel/${id}`),
+    // Which page is entry no. N on (for the current search/filters)? -> { found, page, position }
+    locate: (params) => http.get(`/old-excel/locate?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v != null))}`),
     batches: () => http.get('/old-excel/batches'),
     removeBatch: (id) => http.delete(`/old-excel/batches/${id}`),
     print: (params) => http.get(`/old-excel/print?${new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null))}`)
@@ -95,3 +101,4 @@ export const oldExcelApi = {
 
 // Leads added by hand (separate from the Excel data).
 export const leadsApi = createResourceApi('leads');
+export const followupLogApi = createResourceApi('followuplog');
